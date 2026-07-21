@@ -1,0 +1,71 @@
+/* Main Window Background Gradient */
+.root-pane {
+    -fx-background-color: linear-gradient(to bottom right, #fce4ec, #f8bbd0);
+}
+
+/* Centered White Card Container */
+.login-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 16, 0, 0, 6);
+}
+
+/* Headings */
+.title-label {
+    -fx-font-family: "Times New Roman", serif;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+.subtitle-label {
+    -fx-font-family: "System", sans-serif;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #666666;
+}
+
+.field-label {
+    -fx-font-family: "System", sans-serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #424242;
+}
+
+/* Input Fields */
+.input-field {
+    -fx-pref-height: 36px;
+    -fx-font-size: 13px;
+    -fx-background-color: #fafafa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 0 10px;
+}
+
+/* Web-compatible pseudo aliases recognized by IntelliJ */
+.input-field:focus{
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e91e63;
+    -fx-border-width: 1.5px;
+}
+
+/* Action Button */
+.login-button {
+    -fx-pref-height: 38px;
+    -fx-background-color: #e91e63;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Times New Roman", serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.login-button:hover {
+    -fx-background-color: #d81b60;
+}
+
+.login-button:active{
+    -fx-background-color: #c2185b;
+}
