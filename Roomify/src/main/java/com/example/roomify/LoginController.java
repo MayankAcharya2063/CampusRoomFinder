@@ -3,6 +3,7 @@ package com.example.roomify;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import com.example.roomify.validation.InputValidator;
 
 public class LoginController {
 
@@ -16,14 +17,38 @@ public class LoginController {
     private Button loginButton;
 
     @FXML
-    void handleLoginSubmit(ActionEvent event) {
-        String email = emailField.getText().trim();
-        String password = passwordField.getText();
+    void handleLoginSubmit(ActionEvent event) {// UI Guard: disable button during processing
+        loginButton.setDisable(true);
 
-        if (email.isEmpty() || password.isEmpty()) {
-            showErrorAlert("Validation Error", "Please fill in both the username/email and password fields.");
-            return;
-        }
+        try {
+            String email = emailField.getText().trim();
+            String password = passwordField.getText();
+
+            // Empty field validation
+            if (InputValidator.isNullOrEmpty(email) ||
+                    InputValidator.isNullOrEmpty(password)) {
+
+                showErrorAlert(
+                        "Validation Error",
+                        "Both email and password are required.");
+                return;
+            }
+
+            // Email format validation
+            if (!InputValidator.isValidEmail(email)) {
+                showErrorAlert(
+                        "Invalid Email",
+                        "Please enter a valid Roomify email (example@roomify.com).");
+                return;
+            }
+
+            // Password strength validation
+            if (!InputValidator.isValidPassword(password)) {
+                showErrorAlert(
+                        "Weak Password",
+                        "Password must contain at least 6 characters, including one letter and one number.");
+                return;
+            }
         //Authentication and Role Verification
         // Dibisha's persistence layer will eventually replace this by reading files.
         UserRole authenticatedRole = authenticateUser(email, password);
@@ -36,6 +61,27 @@ public class LoginController {
         } else {
             showErrorAlert("Authentication Failed", "Invalid username or password. Please try again.");
         }
+        } finally {
+            // Re-enable button
+            loginButton.setDisable(false);
+        }
+    }
+    @FXML
+    public void initialize() {
+
+        // Limit email length
+        emailField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.length() > 50) {
+                emailField.setText(oldValue);
+            }
+        });
+
+        // Limit password length
+        passwordField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue.length() > 20) {
+                passwordField.setText(oldValue);
+            }
+        });
     }
 
     /**
