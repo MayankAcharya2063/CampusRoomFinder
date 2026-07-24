@@ -1,5 +1,6 @@
-package com.example.roomify;
+package com.example.roomify.controller;
 
+import com.example.roomify.UserRole;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
