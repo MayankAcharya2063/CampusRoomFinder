@@ -16,7 +16,6 @@ import java.util.List;
 public class FormValidator {
 
     private static FormValidator instance;
-    private final InputValidator inputValidator;
     private final ResourceStatusManager resourceStatusManager;
 
     // Booking validation constants
@@ -25,7 +24,6 @@ public class FormValidator {
     private static final int MAX_ADVANCE_BOOKING_DAYS = 30;
 
     private FormValidator() {
-        this.inputValidator = new InputValidator();
         this.resourceStatusManager = ResourceStatusManager.getInstance();
     }
 
@@ -144,8 +142,8 @@ public class FormValidator {
                     com.example.roomify.model.Booking existing =
                             (com.example.roomify.model.Booking) obj;
 
-                    // Skip cancelled bookings
-                    if ("CANCELLED".equals(existing.getBookingStatus())) {
+                    // Skip cancelled bookings - using getStatus() instead of getBookingStatus()
+                    if ("CANCELLED".equals(existing.getStatus())) {
                         continue;
                     }
 
@@ -164,7 +162,7 @@ public class FormValidator {
                         return ValidationResult.failure(
                                 "Resource is already booked for the selected time slot.\n" +
                                         "Existing booking: " + existing.getStartTime() + " - " +
-                                        existing.getEndTime() + " by " + existing.getCreatorName()
+                                        existing.getEndTime() + " by " + existing.getRequesterName()
                         );
                     }
                 }
