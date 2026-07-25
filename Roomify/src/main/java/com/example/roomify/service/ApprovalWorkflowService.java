@@ -14,7 +14,6 @@ import java.util.List;
 public class ApprovalWorkflowService {
 
     private static ApprovalWorkflowService instance;
-
     private List<Approval> approvalList;
     private int nextApprovalNumber = 1;
 
@@ -31,7 +30,6 @@ public class ApprovalWorkflowService {
         }
         return instance;
     }
-
 
     public Approval submitForApproval(String bookingId, String resourceId, String requestedByUserId) {
         String approvalId = "APR-" + nextApprovalNumber;
@@ -96,3 +94,43 @@ public class ApprovalWorkflowService {
 
         System.out.println(approvalId + " rejected by " + adminUser.getName() + ". Reason: " + reason);
     }
+
+    /**
+     * Finds an approval by its ID.
+     *
+     * @param approvalId The approval ID to search for
+     * @return The Approval object if found, null otherwise
+     */
+    public Approval findApprovalById(String approvalId) {
+        for (Approval approval : approvalList) {
+            if (approval.getApprovalId().equals(approvalId)) {
+                return approval;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets all pending approvals.
+     *
+     * @return List of approvals with PENDING status
+     */
+    public List<Approval> getPendingApprovals() {
+        List<Approval> pendingApprovals = new ArrayList<>();
+        for (Approval approval : approvalList) {
+            if (approval.getStatus() == ApprovalStatus.PENDING) {
+                pendingApprovals.add(approval);
+            }
+        }
+        return pendingApprovals;
+    }
+
+    /**
+     * Gets all approvals.
+     *
+     * @return List of all approvals
+     */
+    public List<Approval> getAllApprovals() {
+        return new ArrayList<>(approvalList);
+    }
+}

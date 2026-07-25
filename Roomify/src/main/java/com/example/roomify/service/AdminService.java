@@ -40,17 +40,14 @@ public class AdminService {
         approvalWorkflowService.rejectRequest(approvalId, adminUser, reason);
     }
 
-
     public void cancelBooking(String bookingId, User adminUser, String reason)
             throws UnauthorizedAccessException {
 
         AuthorizationGuard.requireAdmin(adminUser.getRole());
 
-
         System.out.println("Booking " + bookingId + " was cancelled by Admin "
                 + adminUser.getName() + ". Reason: " + reason);
     }
-
 
     public void overrideDecision(String approvalId, User adminUser, ApprovalStatus newStatus, String reason)
             throws UnauthorizedAccessException {
@@ -79,9 +76,12 @@ public class AdminService {
     }
 
     public List<Approval> getPendingApprovals() {
-        return approvalWorkflowService.();
+        return approvalWorkflowService.getPendingApprovals();
     }
 
+    public List<Approval> getAllApprovals() {
+        return approvalWorkflowService.getAllApprovals();
+    }
 
     private Admin requireAdminPermission(User user, String permission) throws UnauthorizedAccessException {
         AuthorizationGuard.requireAdmin(user.getRole());
