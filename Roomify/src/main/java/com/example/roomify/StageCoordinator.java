@@ -1,8 +1,6 @@
 package com.example.roomify;
 
-import com.example.roomify.controller.AdminDashboardController;
-import com.example.roomify.controller.BookingController;
-import com.example.roomify.controller.ResourceListController;
+import com.example.roomify.controller.*;
 import com.example.roomify.model.Resource;
 import com.example.roomify.model.User;
 import com.example.roomify.util.AlertHelper;
@@ -20,7 +18,6 @@ import java.net.URL;
 public class StageCoordinator {
 
     private static final String FXML_BASE = "/com/example/roomify/";
-
     private static StageCoordinator instance;
     private User currentUser;
 
@@ -40,24 +37,65 @@ public class StageCoordinator {
     }
 
     /**
-     * Navigate to the Admin Dashboard (single-window approach).
+     * Navigate to the Admin Dashboard.
      */
     public void showAdminDashboard(User user, Stage stage) {
         this.currentUser = user;
         try {
-            FXMLLoader loader = createLoader("admin-dashboard.fxml");
+            FXMLLoader loader = createLoader("admin-dashboard-view.fxml");
             Parent root = loader.load();
-
             AdminDashboardController controller = loader.getController();
             if (controller != null) {
                 controller.initContext(user);
             }
-
             switchScene(stage, root, "Roomify - Admin Dashboard", 1100, 700);
         } catch (Exception e) {
             handleLoadFailure("Admin Dashboard", e);
         }
     }
+
+    /**
+     * Navigate to the Student Dashboard.
+     */
+    public void showStudentDashboard(User user, Stage stage) {
+        this.currentUser = user;
+        try {
+            System.out.println("Loading Student Dashboard...");
+            FXMLLoader loader = createLoader("student-dashboard-view.fxml");
+            Parent root = loader.load();
+            StudentDashboardController controller = loader.getController();
+            if (controller != null) {
+                controller.initContext(user);
+            }
+            switchScene(stage, root, "Roomify - Student Dashboard", 1100, 700);
+        } catch (Exception e) {
+            System.err.println("Error loading Student Dashboard: " + e.getMessage());
+            e.printStackTrace();
+            handleLoadFailure("Student Dashboard", e);
+        }
+    }
+
+    /**
+     * Navigate to the Staff Dashboard.
+     */
+    public void showStaffDashboard(User user, Stage stage) {
+        this.currentUser = user;
+        try {
+            System.out.println("Loading Staff Dashboard...");
+            FXMLLoader loader = createLoader("staff-dashboard-view.fxml");
+            Parent root = loader.load();
+            StaffDashboardController controller = loader.getController();
+            if (controller != null) {
+                controller.initContext(user);
+            }
+            switchScene(stage, root, "Roomify - Staff Dashboard", 1100, 700);
+        } catch (Exception e) {
+            System.err.println("Error loading Staff Dashboard: " + e.getMessage());
+            e.printStackTrace();
+            handleLoadFailure("Staff Dashboard", e);
+        }
+    }
+
     /**
      * Navigate to the Resource List screen.
      */
@@ -66,12 +104,10 @@ public class StageCoordinator {
         try {
             FXMLLoader loader = createLoader("resource-list-view.fxml");
             Parent root = loader.load();
-
             ResourceListController controller = loader.getController();
             if (controller != null) {
                 controller.initContext(user);
             }
-
             switchScene(stage, root, "Roomify - Available Resources", 900, 600);
         } catch (Exception e) {
             handleLoadFailure("Resource List", e);
@@ -86,67 +122,24 @@ public class StageCoordinator {
         try {
             FXMLLoader loader = createLoader("booking-view.fxml");
             Parent root = loader.load();
-
             BookingController controller = loader.getController();
             if (controller != null) {
                 controller.initContext(user, resource);
             }
-
-            switchScene(stage, root, "Roomify - New Booking", 640, 520);
+            switchScene(stage, root, "Roomify - New Booking", 640, 620);
         } catch (Exception e) {
             handleLoadFailure("Booking View", e);
         }
     }
-    /**
-     * Navigate to the Manage Users screen.
-     */
-    public void showManageUsers(Stage stage) {
-        try {
-            FXMLLoader loader = createLoader("manage-users-view.fxml");
-            Parent root = loader.load();
-
-            switchScene(stage, root, "Roomify - Manage Users", 950, 650);
-        } catch (Exception e) {
-            handleLoadFailure("Manage Users", e);
-        }
-    }
 
     /**
-     * Navigate to the Booking Approval screen.
-     */
-    public void showApprovalDashboard(Stage stage) {
-        try {
-            FXMLLoader loader = createLoader("approval-view.fxml");
-            Parent root = loader.load();
-
-            switchScene(stage, root, "Roomify - Booking Approval", 1000, 650);
-        } catch (Exception e) {
-            handleLoadFailure("Booking Approval", e);
-        }
-    }
-
-    /**
-     * Navigate to the Reports screen.
-     */
-    public void showReports(Stage stage) {
-        try {
-            FXMLLoader loader = createLoader("report-view.fxml");
-            Parent root = loader.load();
-
-            switchScene(stage, root, "Roomify - Reports", 950, 650);
-        } catch (Exception e) {
-            handleLoadFailure("Reports", e);
-        }
-    }
-    /**
-     * Navigate back to the Login screen.
+     * Navigate to the Login screen.
      */
     public void showLogin(Stage stage) {
         this.currentUser = null;
         try {
             FXMLLoader loader = createLoader("login-view.fxml");
             Parent root = loader.load();
-
             switchScene(stage, root, "Roomify - Login", 700, 500);
         } catch (Exception e) {
             handleLoadFailure("Login View", e);
@@ -160,15 +153,25 @@ public class StageCoordinator {
         String primaryPath = FXML_BASE + fxmlFileName;
         URL resourceUrl = getClass().getResource(primaryPath);
 
+        System.out.println("Looking for: " + primaryPath);
+
         // Fallback search at root classpath
         if (resourceUrl == null) {
             resourceUrl = getClass().getResource("/" + fxmlFileName);
+            System.out.println("Fallback looking for: /" + fxmlFileName);
+        }
+
+        if (resourceUrl == null) {
+            // Try without leading slash
+            resourceUrl = getClass().getResource(fxmlFileName);
+            System.out.println("Final fallback looking for: " + fxmlFileName);
         }
 
         if (resourceUrl == null) {
             throw new IOException("Could not locate FXML file: " + fxmlFileName);
         }
 
+        System.out.println("Found FXML at: " + resourceUrl);
         return new FXMLLoader(resourceUrl);
     }
 

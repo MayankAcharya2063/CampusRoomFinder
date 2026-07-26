@@ -8,29 +8,19 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.control.TextField?>
+
 <VBox spacing="16.0" xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.roomify.controller.BookingApprovalController">
 
     <children>
         <!-- Header -->
-        <VBox spacing="4.0">
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
             <children>
                 <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1E293B;" text="Booking Approvals" />
-                <Label style="-fx-text-fill: #64748B;" text="Review and manage pending booking requests." />
-            </children>
-        </VBox>
-
-        <!-- Status Bar -->
-        <HBox spacing="20.0">
-            <children>
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #1E293B;" text="Pending Approvals:" />
-                <Label fx:id="pendingCountLabel" style="-fx-font-weight: bold; -fx-text-fill: #3B82F6;" text="0" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh" />
+                <Label fx:id="pendingCountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;" text="Pending: 0" />
             </children>
         </HBox>
 
@@ -39,22 +29,28 @@
             <columns>
                 <TableColumn fx:id="bookingIdColumn" prefWidth="100.0" text="Booking ID" />
                 <TableColumn fx:id="requesterColumn" prefWidth="150.0" text="Requester" />
-                <TableColumn fx:id="resourceColumn" prefWidth="180.0" text="Resource" />
+                <TableColumn fx:id="resourceColumn" prefWidth="150.0" text="Resource" />
                 <TableColumn fx:id="dateColumn" prefWidth="120.0" text="Date" />
                 <TableColumn fx:id="startTimeColumn" prefWidth="100.0" text="Start" />
                 <TableColumn fx:id="endTimeColumn" prefWidth="100.0" text="End" />
-                <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
+                <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Status" />
             </columns>
         </TableView>
 
-        <!-- Action Panel -->
-        <HBox spacing="12.0" alignment="CENTER_LEFT">
+        <!-- Rejection Reason - Using TextArea -->
+        <VBox spacing="6.0">
+            <children>
+                <Label text="Rejection Reason:" style="-fx-font-weight: bold; -fx-text-fill: #1E293B;" />
+                <TextArea fx:id="rejectReasonField" promptText="Enter rejection reason..." prefHeight="60.0" />
+            </children>
+        </VBox>
+
+        <!-- Action Buttons -->
+        <HBox spacing="12.0">
             <children>
                 <Button onAction="#handleApprove" styleClass="btn-success" text="✅ Approve" />
                 <Button onAction="#handleReject" styleClass="btn-danger" text="❌ Reject" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Label style="-fx-text-fill: #64748B;" text="Rejection Reason:" />
-                <TextField fx:id="rejectReasonField" promptText="Enter reason for rejection..." HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh" />
             </children>
         </HBox>
     </children>
@@ -62,5 +58,4 @@
     <padding>
         <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
     </padding>
-
 </VBox>

@@ -2,6 +2,8 @@ package com.example.roomify.controller;
 
 import com.example.roomify.model.Resource;
 import com.example.roomify.model.User;
+import com.example.roomify.persistence.ResourceFileHandler;
+import com.example.roomify.persistence.SystemLogger;
 import com.example.roomify.util.AlertFactory;
 import com.example.roomify.util.AlertHelper;
 import com.example.roomify.validation.InputValidator;
@@ -15,6 +17,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Manage Resource Controller - CRUD operations for campus resources.
@@ -48,17 +52,15 @@ public class ManageResourceController {
         this.currentUser = user;
         setupComboBoxes();
         setupTableColumns();
-        loadSampleResources();
+        loadResources();
         setupTableSelectionListener();
     }
 
-
-    // Add this to your ManageResourceController.java initialize() method
     @FXML
     public void initialize() {
         setupComboBoxes();
         setupTableColumns();
-        loadSampleResources();
+        loadResources();
         setupTableSelectionListener();
 
         // Add row selection styling
@@ -130,17 +132,50 @@ public class ManageResourceController {
         });
     }
 
+    private void loadResources() {
+        allResources.clear();
+
+        // Load from file
+        List<Resource> savedResources = ResourceFileHandler.loadResources();
+        if (savedResources != null && !savedResources.isEmpty()) {
+            // Use a Map to track unique resource IDs to prevent duplicates
+            Map<String, Resource> uniqueMap = new LinkedHashMap<>();
+            for (Resource resource : savedResources) {
+                uniqueMap.put(resource.getResourceId(), resource);
+            }
+            allResources.addAll(uniqueMap.values());
+            System.out.println("Loaded " + allResources.size() + " unique resources");
+        } else {
+            // Load sample resources if no saved data
+            loadSampleResources();
+        }
+
+        filteredResources = new FilteredList<>(allResources, p -> true);
+        resourceTable.setItems(filteredResources);
+    }
+
     private void loadSampleResources() {
-        allResources.setAll(
+        allResources.addAll(
                 new Resource("RES-001", "Study Room 3A", "Study Room", 4, "AVAILABLE", "Library Building"),
                 new Resource("RES-002", "Computer Lab C", "Computer Lab", 30, "AVAILABLE", "BCS Block"),
                 new Resource("RES-003", "Main Auditorium", "Auditorium", 200, "UNDER_MAINTENANCE", "Main Hall"),
                 new Resource("RES-004", "Discussion Room 2B", "Discussion Room", 8, "AVAILABLE", "Block A"),
                 new Resource("RES-005", "Conference Room", "Conference Room", 15, "BOOKED", "Admin Building")
         );
+        saveResources();
+    }
 
-        filteredResources = new FilteredList<>(allResources, p -> true);
-        resourceTable.setItems(filteredResources);
+    private void saveResources() {
+        // Remove duplicates before saving
+        Map<String, Resource> uniqueMap = new LinkedHashMap<>();
+        for (Resource resource : allResources) {
+            uniqueMap.put(resource.getResourceId(), resource);
+        }
+        List<Resource> uniqueList = new ArrayList<>(uniqueMap.values());
+
+        ResourceFileHandler.saveResources(uniqueList);
+        ResourceFileHandler.saveResourcesToText(uniqueList);
+        System.out.println("Saved " + uniqueList.size() + " resources");
     }
 
     private void setupTableSelectionListener() {
@@ -195,7 +230,17 @@ public class ManageResourceController {
         return null;
     }
 
+    private void refreshTable() {
+        // Refresh the filtered list
+        filteredResources = new FilteredList<>(allResources, p -> true);
+        resourceTable.setItems(filteredResources);
+        resourceTable.refresh();
+        // Clear selection
+        resourceTable.getSelectionModel().clearSelection();
+    }
+
     // ==================== EVENT HANDLERS ====================
+
     @FXML
     private void handleSearch(ActionEvent event) {
         String query = searchField.getText().toLowerCase().trim();
@@ -241,12 +286,16 @@ public class ManageResourceController {
         );
 
         allResources.add(resource);
+        saveResources();
         clearForm();
+        refreshTable();
         AlertHelper.showInformation("Success", "Resource added successfully.");
+        SystemLogger.logAdminAction("Resource Added: " + id);
     }
 
     @FXML
     private void handleEdit(ActionEvent event) {
+        // Get the selected item from the table
         Resource selected = resourceTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             AlertHelper.showError("No Selection", "Please select a resource to edit.");
@@ -259,20 +308,43 @@ public class ManageResourceController {
             return;
         }
 
-        // Remove old and add updated
-        allResources.remove(selected);
+        String newId = resourceIdField.getText().trim();
+
+        // Check if ID is being changed and if new ID already exists (excluding the current item)
+        if (!selected.getResourceId().equals(newId)) {
+            boolean exists = allResources.stream()
+                    .anyMatch(r -> r.getResourceId().equalsIgnoreCase(newId));
+            if (exists) {
+                AlertHelper.showError("Duplicate ID", "Resource with ID '" + newId + "' already exists.");
+                return;
+            }
+        }
+
+        // Create updated resource
         Resource updated = new Resource(
-                resourceIdField.getText().trim(),
+                newId,
                 nameField.getText().trim(),
                 typeComboBox.getValue(),
                 Integer.parseInt(capacityField.getText().trim()),
                 statusComboBox.getValue(),
                 locationField.getText().trim()
         );
-        allResources.add(updated);
-        resourceTable.refresh();
+
+        // Find and replace in the list
+        int index = allResources.indexOf(selected);
+        if (index >= 0) {
+            allResources.set(index, updated);
+        } else {
+            // If not found, remove old and add new
+            allResources.remove(selected);
+            allResources.add(updated);
+        }
+
+        saveResources();
         clearForm();
+        refreshTable();
         AlertHelper.showInformation("Success", "Resource updated successfully.");
+        SystemLogger.logAdminAction("Resource Edited: " + updated.getResourceId());
     }
 
     @FXML
@@ -287,9 +359,13 @@ public class ManageResourceController {
                 "Are you sure you want to delete '" + selected.getName() + "'?");
 
         if (confirm) {
+            String resourceId = selected.getResourceId();
             allResources.remove(selected);
+            saveResources();
             clearForm();
+            refreshTable();
             AlertHelper.showInformation("Success", "Resource deleted successfully.");
+            SystemLogger.logAdminAction("Resource Deleted: " + resourceId);
         }
     }
 
@@ -297,8 +373,4 @@ public class ManageResourceController {
     private void handleClearFields(ActionEvent event) {
         clearForm();
     }
-
-    // ==================== INNER CLASS - Extended Resource ====================
-    // Note: The Resource model class needs to be extended with 'location' field
-    // If not, we'll use a wrapper or modify the existing Resource class
 }

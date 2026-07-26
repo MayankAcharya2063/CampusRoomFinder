@@ -2,6 +2,9 @@ package com.example.roomify.model;
 
 import java.io.Serializable;
 
+/**
+ * Resource model for campus resources.
+ */
 public class Resource implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -10,19 +13,9 @@ public class Resource implements Serializable {
     private String type;
     private int capacity;
     private String status;
-    private String location;  // ADD THIS FIELD
+    private String location;
 
-    // Original constructor (keep for backward compatibility)
-    public Resource(String resourceId, String name, String type, int capacity, String status) {
-        this.resourceId = resourceId;
-        this.name = name;
-        this.type = type;
-        this.capacity = capacity;
-        this.status = status;
-        this.location = ""; // Default value
-    }
-
-    // NEW CONSTRUCTOR with location parameter
+    // Constructor with location
     public Resource(String resourceId, String name, String type, int capacity, String status, String location) {
         this.resourceId = resourceId;
         this.name = name;
@@ -32,7 +25,11 @@ public class Resource implements Serializable {
         this.location = location;
     }
 
-    // Getters and Setters
+    // Legacy constructor for backward compatibility
+    public Resource(String resourceId, String name, String type, int capacity, String status) {
+        this(resourceId, name, type, capacity, status, "N/A");
+    }
+
     public String getResourceId() { return resourceId; }
     public void setResourceId(String resourceId) { this.resourceId = resourceId; }
 
@@ -48,8 +45,8 @@ public class Resource implements Serializable {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getLocation() { return location; }  // ADD GETTER
-    public void setLocation(String location) { this.location = location; }  // ADD SETTER
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
     @Override
     public String toString() {

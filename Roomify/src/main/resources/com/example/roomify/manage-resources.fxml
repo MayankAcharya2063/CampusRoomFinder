@@ -7,12 +7,10 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="16.0" styleClass="root-pane"
-      xmlns="http://javafx.com/javafx/17.0.12"
+<VBox spacing="16.0" xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.roomify.controller.ManageResourceController">
 
@@ -37,9 +35,9 @@
         <!-- Resource Table -->
         <TableView fx:id="resourceTable" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="resourceIdColumn" prefWidth="100.0" text="ID" />
+                <TableColumn fx:id="resourceIdColumn" prefWidth="100.0" text="Resource ID" />
                 <TableColumn fx:id="nameColumn" prefWidth="180.0" text="Name" />
-                <TableColumn fx:id="typeColumn" prefWidth="120.0" text="Type" />
+                <TableColumn fx:id="typeColumn" prefWidth="150.0" text="Type" />
                 <TableColumn fx:id="locationColumn" prefWidth="150.0" text="Location" />
                 <TableColumn fx:id="capacityColumn" prefWidth="80.0" text="Capacity" />
                 <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
@@ -52,7 +50,7 @@
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #1E293B;" text="Resource Details" />
                 <HBox spacing="12.0">
                     <children>
-                        <TextField fx:id="resourceIdField" promptText="Resource ID (e.g., RES-001)" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="resourceIdField" promptText="Resource ID (RES-XXX)" HBox.hgrow="ALWAYS" />
                         <TextField fx:id="nameField" promptText="Resource Name" HBox.hgrow="ALWAYS" />
                         <ComboBox fx:id="typeComboBox" promptText="Type" HBox.hgrow="ALWAYS" />
                     </children>
@@ -82,5 +80,4 @@
     <padding>
         <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
     </padding>
-
 </VBox>

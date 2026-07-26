@@ -1,5 +1,7 @@
 package com.example.roomify.persistence;
 
+import com.example.roomify.model.Resource;
+
 import java.util.List;
 
 /**
@@ -12,19 +14,32 @@ public class ResourceFileHandler {
     /**
      * Saves all resources.
      */
-    public static <T> void saveResources(List<T> resources) {
-
+    public static void saveResources(List<Resource> resources) {
         FilePersistenceEngine.saveObjects(resources, RESOURCE_FILE);
-
     }
 
     /**
      * Loads all resources.
      */
-    public static <T> List<T> loadResources() {
-
+    @SuppressWarnings("unchecked")
+    public static List<Resource> loadResources() {
         return FilePersistenceEngine.loadObjects(RESOURCE_FILE);
-
     }
 
+    /**
+     * Save resources to text file (for readability).
+     */
+    public static void saveResourcesToText(List<Resource> resources) {
+        StringBuilder sb = new StringBuilder();
+        for (Resource resource : resources) {
+            sb.append(resource.getResourceId()).append("|")
+                    .append(resource.getName()).append("|")
+                    .append(resource.getType()).append("|")
+                    .append(resource.getLocation()).append("|")
+                    .append(resource.getCapacity()).append("|")
+                    .append(resource.getStatus())
+                    .append("\n");
+        }
+        FilePersistenceEngine.writeText("resources.txt", sb.toString());
+    }
 }

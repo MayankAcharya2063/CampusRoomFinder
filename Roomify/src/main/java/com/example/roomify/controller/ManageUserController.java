@@ -1,7 +1,10 @@
 package com.example.roomify.controller;
 
-import com.example.roomify.StageCoordinator;
+import com.example.roomify.model.Admin;
+import com.example.roomify.model.Staff;
+import com.example.roomify.model.Student;
 import com.example.roomify.model.User;
+import com.example.roomify.service.AuthenticationService;
 import com.example.roomify.service.SessionManager;
 import com.example.roomify.util.AlertFactory;
 import com.example.roomify.util.AlertHelper;
@@ -15,7 +18,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -40,16 +42,18 @@ public class ManageUserController {
     @FXML private TextField emailField;
     @FXML private ComboBox<String> roleComboBox;
     @FXML private TextField departmentField;
-    @FXML private TextField passwordField;
+    @FXML private PasswordField passwordField;
 
     // ==================== SERVICE REFERENCES ====================
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final AlertFactory alertFactory = AlertFactory.getInstance();
+    private final AuthenticationService authService = AuthenticationService.getInstance();
 
     // ==================== DATA ====================
     private ObservableList<UserRow> allUsers = FXCollections.observableArrayList();
     private FilteredList<UserRow> filteredUsers;
     private User currentUser;
+    private UserRow lastSelectedUser = null;
 
     // ==================== INITIALIZATION ====================
     public void initContext(User user) {
@@ -60,7 +64,6 @@ public class ManageUserController {
         setupTableSelectionListener();
     }
 
-    // Add this to your ManageUserController.java initialize() method
     @FXML
     public void initialize() {
         setupComboBoxes();
@@ -124,26 +127,37 @@ public class ManageUserController {
     }
 
     private void loadUsers() {
-        List<UserRow> userList = generatePlaceholderUsers();
-        allUsers.setAll(userList);
+        allUsers.clear();
+
+        // Load from AuthenticationService
+        var userMap = authService.getAllUsers();
+        for (User user : userMap.values()) {
+            String department = "";
+            if (user instanceof Student) {
+                department = ((Student) user).getDepartment();
+            } else if (user instanceof Staff) {
+                department = ((Staff) user).getDepartment();
+            } else if (user instanceof Admin) {
+                department = "Administration";
+            }
+
+            allUsers.add(new UserRow(
+                    user.getUserId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole().name(),
+                    department
+            ));
+        }
+
         filteredUsers = new FilteredList<>(allUsers, p -> true);
         userTable.setItems(filteredUsers);
-    }
-
-    private List<UserRow> generatePlaceholderUsers() {
-        List<UserRow> users = new ArrayList<>();
-        users.add(new UserRow("U001", "Admin User", "admin@roomify.com", "ADMIN", "Administration"));
-        users.add(new UserRow("U002", "John Staff", "john.staff@roomify.com", "STAFF", "Computer Science"));
-        users.add(new UserRow("U003", "Jane Student", "jane.student@roomify.com", "STUDENT", "Engineering"));
-        users.add(new UserRow("U004", "Michael Lee", "michael.lee@roomify.com", "STAFF", "Mathematics"));
-        users.add(new UserRow("U005", "Sarah Chen", "sarah.chen@roomify.com", "STUDENT", "Business"));
-        users.add(new UserRow("U006", "David Kumar", "david.kumar@roomify.com", "STUDENT", "Computer Science"));
-        return users;
     }
 
     private void setupTableSelectionListener() {
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
+                lastSelectedUser = newVal;
                 populateForm(newVal);
             }
         });
@@ -156,6 +170,7 @@ public class ManageUserController {
         roleComboBox.setValue(user.getRole());
         departmentField.setText(user.getDepartment());
         passwordField.clear();
+        passwordField.setPromptText("Enter new password to change");
     }
 
     private void clearForm() {
@@ -165,7 +180,9 @@ public class ManageUserController {
         roleComboBox.getSelectionModel().selectFirst();
         departmentField.clear();
         passwordField.clear();
+        passwordField.setPromptText("Password (Minimum 6 characters)");
         userTable.getSelectionModel().clearSelection();
+        lastSelectedUser = null;
     }
 
     private String validateForm(boolean isNewUser) {
@@ -173,29 +190,74 @@ public class ManageUserController {
         String name = nameField.getText().trim();
         String email = emailField.getText().trim();
         String role = roleComboBox.getValue();
+        String password = passwordField.getText();
 
+        // Validate User ID
         if (userId.isEmpty()) return "User ID is required.";
         if (userId.length() < 3) return "User ID must be at least 3 characters.";
         if (userId.length() > 20) return "User ID must not exceed 20 characters.";
         if (!InputValidator.isAlphanumeric(userId)) return "User ID must contain only letters and numbers.";
 
+        // Validate Name
         if (name.isEmpty()) return "Name is required.";
         if (!InputValidator.isOnlyLettersAndSpaces(name)) {
             return "Name must contain only letters and spaces.";
         }
         if (name.length() < 2) return "Name must be at least 2 characters.";
 
+        // Validate Email
         if (email.isEmpty()) return "Email is required.";
         if (!InputValidator.isValidEmail(email)) {
             return "Email must be a valid Roomify email (e.g., user@roomify.com).";
         }
 
+        // Validate Role
         if (role == null || role.isEmpty()) return "Role is required.";
+
+        // Validate Password (required for new users)
+        if (isNewUser) {
+            if (password.isEmpty()) return "Password is required.";
+            if (!InputValidator.isValidPassword(password)) {
+                return "Password must be at least 6 characters, containing one letter and one number.";
+            }
+        } else if (!password.isEmpty()) {
+            if (!InputValidator.isValidPassword(password)) {
+                return "Password must be at least 6 characters, containing one letter and one number.";
+            }
+        }
 
         return null;
     }
 
+    private boolean isDuplicateEmail(String email, String currentEmail) {
+        for (UserRow user : allUsers) {
+            if (user.getEmail().equalsIgnoreCase(email) &&
+                    !user.getEmail().equalsIgnoreCase(currentEmail)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isDuplicateUserId(String userId, String currentUserId) {
+        for (UserRow user : allUsers) {
+            if (user.getUserId().equalsIgnoreCase(userId) &&
+                    !user.getUserId().equalsIgnoreCase(currentUserId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void refreshTable() {
+        filteredUsers = new FilteredList<>(allUsers, p -> true);
+        userTable.setItems(filteredUsers);
+        userTable.refresh();
+        userTable.getSelectionModel().clearSelection();
+    }
+
     // ==================== EVENT HANDLERS ====================
+
     @FXML
     private void handleSearch(ActionEvent event) {
         String query = searchField.getText().toLowerCase().trim();
@@ -224,25 +286,51 @@ public class ManageUserController {
         }
 
         String userId = userIdField.getText().trim();
-        boolean exists = allUsers.stream()
-                .anyMatch(u -> u.getUserId().equalsIgnoreCase(userId));
+        String name = nameField.getText().trim();
+        String email = emailField.getText().trim();
+        String role = roleComboBox.getValue();
+        String department = departmentField.getText().trim();
+        String password = passwordField.getText();
 
-        if (exists) {
-            AlertHelper.showError("Duplicate ID", "User with ID '" + userId + "' already exists.");
+        // Check duplicate ID
+        if (isDuplicateUserId(userId, "")) {
+            AlertHelper.showError("Duplicate ID", "User ID '" + userId + "' already exists.");
             return;
         }
 
-        UserRow newUser = new UserRow(
-                userId,
-                nameField.getText().trim(),
-                emailField.getText().trim(),
-                roleComboBox.getValue(),
-                departmentField.getText().trim()
-        );
+        // Check duplicate email
+        if (isDuplicateEmail(email, "")) {
+            AlertHelper.showError("Duplicate Email", "Email '" + email + "' already registered.");
+            return;
+        }
 
-        allUsers.add(newUser);
-        clearForm();
-        AlertHelper.showInformation("Success", "User added successfully.");
+        User newUser;
+        switch (role) {
+            case "STUDENT":
+                String studentId = "ST" + userId;
+                newUser = new Student(userId, name, email, password, studentId, department);
+                break;
+            case "STAFF":
+                String staffId = "SF" + userId;
+                newUser = new Staff(userId, name, email, password, staffId, department);
+                break;
+            case "ADMIN":
+                newUser = new Admin(userId, name, email, password, 1);
+                break;
+            default:
+                AlertHelper.showError("Invalid Role", "Please select a valid role.");
+                return;
+        }
+
+        if (authService.addUser(newUser)) {
+            loadUsers();
+            clearForm();
+            refreshTable();
+            AlertHelper.showInformation("Success", "User added successfully.");
+            com.example.roomify.persistence.SystemLogger.logAdminAction("User Created: " + email);
+        } else {
+            AlertHelper.showError("Error", "Failed to add user.");
+        }
     }
 
     @FXML
@@ -259,18 +347,86 @@ public class ManageUserController {
             return;
         }
 
-        allUsers.remove(selected);
-        UserRow updated = new UserRow(
-                userIdField.getText().trim(),
-                nameField.getText().trim(),
-                emailField.getText().trim(),
-                roleComboBox.getValue(),
-                departmentField.getText().trim()
-        );
-        allUsers.add(updated);
-        userTable.refresh();
+        String userId = userIdField.getText().trim();
+        String name = nameField.getText().trim();
+        String email = emailField.getText().trim();
+        String role = roleComboBox.getValue();
+        String department = departmentField.getText().trim();
+        String password = passwordField.getText();
+
+        // Check duplicate ID (excluding current user)
+        if (isDuplicateUserId(userId, selected.getUserId())) {
+            AlertHelper.showError("Duplicate ID", "User ID '" + userId + "' already exists.");
+            return;
+        }
+
+        // Check duplicate email (excluding current user)
+        if (isDuplicateEmail(email, selected.getEmail())) {
+            AlertHelper.showError("Duplicate Email", "Email '" + email + "' already registered.");
+            return;
+        }
+
+        // Get existing user by email
+        User existingUser = authService.getAllUsers().get(selected.getEmail().toLowerCase());
+        if (existingUser == null) {
+            AlertHelper.showError("Error", "User not found in database.");
+            return;
+        }
+
+        // Store old email for cleanup
+        String oldEmail = existingUser.getEmail().toLowerCase();
+
+        // Update user fields
+        existingUser.setUserId(userId);
+        existingUser.setName(name);
+        existingUser.setEmail(email);
+        if (!password.isEmpty()) {
+            existingUser.setPassword(password);
+        }
+
+        // Update role-specific fields
+        if (existingUser instanceof Student && "STUDENT".equals(role)) {
+            ((Student) existingUser).setDepartment(department);
+        } else if (existingUser instanceof Staff && "STAFF".equals(role)) {
+            ((Staff) existingUser).setDepartment(department);
+        } else if (existingUser instanceof Admin && "ADMIN".equals(role)) {
+            // Admin doesn't have department, but if role changed to admin, we keep admin
+        }
+
+        // If role changed, we may need to recreate the user with proper type
+        boolean roleChanged = !existingUser.getRole().name().equals(role);
+        User updatedUser = existingUser;
+
+        if (roleChanged) {
+            // Remove old user
+            authService.deleteUser(oldEmail);
+            // Create new user with correct role
+            if ("STUDENT".equals(role)) {
+                updatedUser = new Student(userId, name, email,
+                        password.isEmpty() ? existingUser.getPassword() : password,
+                        "ST" + userId, department);
+            } else if ("STAFF".equals(role)) {
+                updatedUser = new Staff(userId, name, email,
+                        password.isEmpty() ? existingUser.getPassword() : password,
+                        "SF" + userId, department);
+            } else if ("ADMIN".equals(role)) {
+                updatedUser = new Admin(userId, name, email,
+                        password.isEmpty() ? existingUser.getPassword() : password, 1);
+            }
+            authService.addUser(updatedUser);
+        } else {
+            // If email changed, remove old entry and add new one
+            if (!oldEmail.equals(email.toLowerCase())) {
+                authService.deleteUser(oldEmail);
+            }
+            authService.updateUser(existingUser);
+        }
+
+        loadUsers();
         clearForm();
+        refreshTable();
         AlertHelper.showInformation("Success", "User updated successfully.");
+        com.example.roomify.persistence.SystemLogger.logAdminAction("User Updated: " + email);
     }
 
     @FXML
@@ -281,6 +437,7 @@ public class ManageUserController {
             return;
         }
 
+        // Prevent deleting the last admin
         boolean isLastAdmin = allUsers.stream()
                 .filter(u -> "ADMIN".equals(u.getRole()))
                 .count() <= 1 && "ADMIN".equals(selected.getRole());
@@ -294,9 +451,15 @@ public class ManageUserController {
                 "Are you sure you want to delete '" + selected.getName() + "'?");
 
         if (confirm) {
-            allUsers.remove(selected);
-            clearForm();
-            AlertHelper.showInformation("Success", "User deleted successfully.");
+            if (authService.deleteUser(selected.getEmail())) {
+                loadUsers();
+                clearForm();
+                refreshTable();
+                AlertHelper.showInformation("Success", "User deleted successfully.");
+                com.example.roomify.persistence.SystemLogger.logAdminAction("User Deleted: " + selected.getEmail());
+            } else {
+                AlertHelper.showError("Error", "Failed to delete user.");
+            }
         }
     }
 
@@ -312,9 +475,19 @@ public class ManageUserController {
                 "Reset password for '" + selected.getName() + "'?");
 
         if (confirm) {
-            AlertHelper.showInformation("Password Reset",
-                    "Password for '" + selected.getName() + "' has been reset.\n" +
-                            "Temporary password: 'temp1234'");
+            User existingUser = authService.getAllUsers().get(selected.getEmail().toLowerCase());
+            if (existingUser != null) {
+                String tempPassword = "temp1234";
+                existingUser.setPassword(tempPassword);
+                if (authService.updateUser(existingUser)) {
+                    AlertHelper.showInformation("Password Reset",
+                            "Password for '" + selected.getName() + "' has been reset.\n" +
+                                    "Temporary password: '" + tempPassword + "'");
+                    com.example.roomify.persistence.SystemLogger.logAdminAction("Password Reset: " + selected.getEmail());
+                } else {
+                    AlertHelper.showError("Error", "Failed to reset password.");
+                }
+            }
         }
     }
 

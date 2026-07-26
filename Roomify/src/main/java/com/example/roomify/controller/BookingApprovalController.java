@@ -29,7 +29,8 @@ public class BookingApprovalController {
     @FXML private TableColumn<Booking, String> startTimeColumn;
     @FXML private TableColumn<Booking, String> endTimeColumn;
     @FXML private TableColumn<Booking, String> statusColumn;
-    @FXML private TextField rejectReasonField;
+    // In BookingApprovalController.java
+    @FXML private TextArea rejectReasonField;
 
     // ==================== DATA ====================
     private final ObservableList<Booking> bookings = FXCollections.observableArrayList();

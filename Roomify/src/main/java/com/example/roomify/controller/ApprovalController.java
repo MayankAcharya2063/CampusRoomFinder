@@ -1,6 +1,8 @@
 package com.example.roomify.controller;
 
 import com.example.roomify.StageCoordinator;
+import com.example.roomify.booking.BookingService;
+import com.example.roomify.model.Booking;
 import com.example.roomify.model.User;
 import com.example.roomify.service.SessionManager;
 import com.example.roomify.util.AlertFactory;
@@ -66,6 +68,7 @@ public class ApprovalController implements Initializable {
 
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final AlertFactory alertFactory = AlertFactory.getInstance();
+    private final BookingService bookingService = new BookingService();
 
     // ==================== DATA ====================
 
@@ -140,56 +143,135 @@ public class ApprovalController implements Initializable {
     }
 
     /**
-     * Loads pending approval requests.
+     * Loads pending approval requests from the booking service.
      */
     private void loadPendingRequests() {
         pendingRequests.clear();
 
-        // Placeholder data - in production, load from service
+        // Load from booking service - get all pending bookings
+        List<Booking> pendingBookings = bookingService.getPendingBookings();
+
+        if (pendingBookings == null || pendingBookings.isEmpty()) {
+            // If no bookings exist, load sample data for demo
+            loadSamplePendingRequests();
+            return;
+        }
+
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (Booking booking : pendingBookings) {
+            if ("PENDING".equalsIgnoreCase(booking.getStatus())) {
+                String date = booking.getStartTime().format(dateFormatter);
+                String time = booking.getStartTime().format(timeFormatter) + " - " +
+                        booking.getEndTime().format(timeFormatter);
+
+                ApprovalRequest request = new ApprovalRequest(
+                        booking.getBookingId(),
+                        booking.getRequesterName(),
+                        booking.getResourceName(),
+                        date,
+                        time,
+                        "PENDING"
+                );
+                pendingRequests.add(request);
+            }
+        }
+
+        // If still empty, load sample data
+        if (pendingRequests.isEmpty()) {
+            loadSamplePendingRequests();
+        } else {
+            pendingTable.setItems(pendingRequests);
+            updatePendingCount();
+        }
+    }
+
+    /**
+     * Loads sample pending requests (for demo/testing).
+     */
+    private void loadSamplePendingRequests() {
+        // Only load samples if we have no pending requests from the service
+        if (!pendingRequests.isEmpty()) {
+            return;
+        }
+
+
         LocalDateTime now = LocalDateTime.now();
 
-        pendingRequests.add(new ApprovalRequest(
-                "BKG-001",
-                "Jane Student",
-                "Study Room 3A",
-                now.plusDays(1).format(dateFormatter),
-                "09:00 - 11:00",
-                "PENDING"
-        ));
-        pendingRequests.add(new ApprovalRequest(
-                "BKG-002",
-                "John Staff",
-                "Computer Lab C",
-                now.plusDays(2).format(dateFormatter),
-                "14:00 - 17:00",
-                "PENDING"
-        ));
-        pendingRequests.add(new ApprovalRequest(
-                "BKG-003",
-                "Sarah Chen",
-                "Seminar Hall",
-                now.plusDays(3).format(dateFormatter),
-                "10:00 - 12:00",
-                "PENDING"
-        ));
-        pendingRequests.add(new ApprovalRequest(
-                "BKG-004",
-                "Michael Lee",
-                "Discussion Room 2B",
-                now.plusDays(1).format(dateFormatter),
-                "13:00 - 14:30",
-                "PENDING"
-        ));
-        pendingRequests.add(new ApprovalRequest(
-                "BKG-005",
-                "Emma Wilson",
-                "Conference Room",
-                now.plusDays(4).format(dateFormatter),
-                "11:00 - 13:00",
-                "PENDING"
-        ));
+        // Create sample bookings and save them to the service
+        String[] sampleData = {
+                "BKG-001|Jane Student|Study Room 3A|" + now.plusDays(1) + "|09:00|11:00",
+                "BKG-002|John Staff|Computer Lab C|" + now.plusDays(2) + "|14:00|17:00",
+                "BKG-003|Sarah Chen|Seminar Hall|" + now.plusDays(3) + "|10:00|12:00",
+                "BKG-004|Michael Lee|Discussion Room 2B|" + now.plusDays(1) + "|13:00|14:30",
+                "BKG-005|Emma Wilson|Conference Room|" + now.plusDays(4) + "|11:00|13:00"
+        };
+
+        for (String data : sampleData) {
+            String[] parts = data.split("\\|");
+            String bookingId = parts[0];
+            String requester = parts[1];
+            String resource = parts[2];
+            String dateStr = parts[3];
+            String startTimeStr = parts[4];
+            String endTimeStr = parts[5];
+
+            try {
+                LocalDateTime start = LocalDateTime.parse(dateStr + "T" + startTimeStr + ":00");
+                LocalDateTime end = LocalDateTime.parse(dateStr + "T" + endTimeStr + ":00");
+
+                Booking booking = new Booking(
+                        bookingId,
+                        "RES-001",
+                        resource,
+                        requester,
+                        start,
+                        end,
+                        "General booking",
+                        "PENDING"
+                );
+
+                // Add to service
+                try {
+                    bookingService.createBooking(
+                            bookingId,
+                            "USER-001",
+                            "RES-001",
+                            start,
+                            end,
+                            requester
+                    );
+                } catch (Exception e) {
+                    // Booking might already exist, that's fine
+                }
+            } catch (Exception e) {
+                System.err.println("Error creating sample booking: " + e.getMessage());
+            }
+        }
+
+        // Reload from service
+        List<Booking> pendingBookings = bookingService.getPendingBookings();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (Booking booking : pendingBookings) {
+            if ("PENDING".equalsIgnoreCase(booking.getStatus())) {
+                String date = booking.getStartTime().format(dateFormatter);
+                String time = booking.getStartTime().format(timeFormatter) + " - " +
+                        booking.getEndTime().format(timeFormatter);
+
+                ApprovalRequest request = new ApprovalRequest(
+                        booking.getBookingId(),
+                        booking.getRequesterName(),
+                        booking.getResourceName(),
+                        date,
+                        time,
+                        "PENDING"
+                );
+                pendingRequests.add(request);
+            }
+        }
 
         pendingTable.setItems(pendingRequests);
         updatePendingCount();
@@ -275,12 +357,25 @@ public class ApprovalController implements Initializable {
                         "Date: " + selected.getDate() + " " + selected.getTime());
 
         if (confirm) {
-            pendingRequests.remove(selected);
-            updatePendingCount();
-            updateStatus("Approved booking: " + selected.getBookingId());
-            alertFactory.showSuccessAlert("Booking Approved",
-                    "Booking '" + selected.getBookingId() + "' has been approved.\n" +
-                            "The user has been notified.");
+            // Update the booking status in the service
+            boolean success = bookingService.approveBooking(selected.getBookingId());
+
+            if (success) {
+                // Remove from UI list
+                pendingRequests.remove(selected);
+                updatePendingCount();
+                updateStatus("Approved booking: " + selected.getBookingId());
+                updateLastUpdate();
+
+                // Log the action
+                com.example.roomify.persistence.SystemLogger.logBookingApproved(selected.getBookingId());
+
+                alertFactory.showSuccessAlert("Booking Approved",
+                        "Booking '" + selected.getBookingId() + "' has been approved.\n" +
+                                "The user has been notified.");
+            } else {
+                alertFactory.showErrorAlert("Error", "Failed to approve booking. Please try again.");
+            }
         }
     }
 
@@ -307,14 +402,27 @@ public class ApprovalController implements Initializable {
                         "Reason: " + reason);
 
         if (confirm) {
-            pendingRequests.remove(selected);
-            updatePendingCount();
-            updateStatus("Rejected booking: " + selected.getBookingId());
-            alertFactory.showInfoAlert("Booking Rejected",
-                    "Booking '" + selected.getBookingId() + "' has been rejected.\n" +
-                            "Reason: " + reason + "\n" +
-                            "The user has been notified.");
-            rejectReasonArea.clear();
+            // Update the booking status in the service
+            boolean success = bookingService.rejectBooking(selected.getBookingId());
+
+            if (success) {
+                // Remove from UI list
+                pendingRequests.remove(selected);
+                updatePendingCount();
+                updateStatus("Rejected booking: " + selected.getBookingId());
+                updateLastUpdate();
+
+                // Log the action
+                com.example.roomify.persistence.SystemLogger.logBookingRejected(selected.getBookingId());
+
+                alertFactory.showInfoAlert("Booking Rejected",
+                        "Booking '" + selected.getBookingId() + "' has been rejected.\n" +
+                                "Reason: " + reason + "\n" +
+                                "The user has been notified.");
+                rejectReasonArea.clear();
+            } else {
+                alertFactory.showErrorAlert("Error", "Failed to reject booking. Please try again.");
+            }
         }
     }
 
@@ -342,10 +450,11 @@ public class ApprovalController implements Initializable {
     }
 
     /**
-     * Handles refresh button click.
+     * Handles refresh button click - reloads from the actual data source.
      */
     @FXML
     private void handleRefresh(ActionEvent event) {
+        // Force reload from the booking service
         loadPendingRequests();
         updateLastUpdate();
         updateStatus("Approvals refreshed");

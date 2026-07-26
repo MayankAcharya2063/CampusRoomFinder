@@ -16,3 +16,45 @@
 [2026-07-26 16:10:09] User Login : admin@roomify.com
 [2026-07-26 16:12:17] User Login : admin@roomify.com
 [2026-07-26 16:22:44] User Login : admin@roomify.com
+[2026-07-26 17:59:36] User Login : admin@roomify.com
+[2026-07-26 18:03:37] User Login : admin@roomify.com
+[2026-07-26 18:17:59] User Login : admin@roomify.com
+[2026-07-26 18:18:42] ADMIN ACTION : Resource Added: RES-006
+[2026-07-26 18:56:54] User Login : admin@roomify.com
+[2026-07-26 18:59:33] ADMIN ACTION : User Created: tom@roomify.com
+[2026-07-26 19:00:05] User Login : tom@roomify.com
+[2026-07-26 19:03:50] User Login : admin@roomify.com
+[2026-07-26 19:09:57] User Login : admin@roomify.com
+[2026-07-26 19:16:09] User Login : admin@roomify.com
+[2026-07-26 19:18:04] User Login : admin@roomify.com
+[2026-07-26 19:18:05] Booking Created : BKG-001
+[2026-07-26 19:18:05] Booking Created : BKG-002
+[2026-07-26 19:18:05] Booking Created : BKG-003
+[2026-07-26 19:18:05] Booking Created : BKG-004
+[2026-07-26 19:20:56] User Login : admin@roomify.com
+[2026-07-26 19:23:30] User Login : admin@roomify.com
+[2026-07-26 19:24:29] User Login : admin@roomify.com
+[2026-07-26 19:34:40] User Login : admin@roomify.com
+[2026-07-26 19:35:02] ADMIN ACTION : Resource Edited: RES-005
+[2026-07-26 19:35:33] ADMIN ACTION : Resource Edited: RES-002
+[2026-07-26 19:35:55] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 19:36:04] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 19:36:10] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 19:46:02] User Login : admin@roomify.com
+[2026-07-26 19:46:38] ADMIN ACTION : Resource Added: RES-001
+[2026-07-26 19:46:52] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 19:46:59] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 19:47:03] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 19:47:13] ADMIN ACTION : Resource Edited: RES-001
+[2026-07-26 20:34:27] User Login : tom@roomify.com
+[2026-07-26 20:39:11] User Login : tom@roomify.com
+[2026-07-26 20:48:38] User Login : tom@roomify.com
+[2026-07-26 20:49:08] Booking Created : BKG-005
+[2026-07-26 20:49:08] Booking Created : BKG-005
+[2026-07-26 20:50:17] User Login : admin@roomify.com
+[2026-07-26 20:53:01] User Login : admin@roomify.com
+[2026-07-26 20:57:46] User Login : admin@roomify.com
+[2026-07-26 20:58:22] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 20:58:29] ADMIN ACTION : User Updated: tom@roomify.com
+[2026-07-26 20:59:15] ADMIN ACTION : Resource Added: RES-006
+[2026-07-26 20:59:21] ADMIN ACTION : Resource Edited: RES-006

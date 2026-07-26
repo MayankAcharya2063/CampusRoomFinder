@@ -1,0 +1,53 @@
+RES-001|Study Room 3A|Study Room|Library Building|4|AVAILABLE
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+
+RES-001|Study Room 3A|Study Room|Library Building|4|AVAILABLE
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-006|VR Room|Other|BSC Block|50|UNDER_MAINTENANCE
+
+RES-001|Study Room 3A|Study Room|Library Building|4|AVAILABLE
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-001|VR Room|Other|BCS Block|50|AVAILABLE
+
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-001|Conference Room|Conference Room|Admin Building|15|BOOKED
+
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-001|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-006|VR Room|Other|BCS Block|50|AVAILABLE
+
+RES-002|Computer Lab C|Computer Lab|BCS Block|30|AVAILABLE
+RES-003|Main Auditorium|Auditorium|Main Hall|200|UNDER_MAINTENANCE
+RES-004|Discussion Room 2B|Discussion Room|Block A|8|AVAILABLE
+RES-005|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-001|Conference Room|Conference Room|Admin Building|15|BOOKED
+RES-006|VR Room|Other|BCS Block|50|UNDER_MAINTENANCE
+
