@@ -5,39 +5,27 @@ import com.example.roomify.controller.BookingController;
 import com.example.roomify.controller.ResourceListController;
 import com.example.roomify.model.Resource;
 import com.example.roomify.model.User;
+import com.example.roomify.util.AlertHelper;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Central Stage Routing Manager.
- * <p>
- * Singleton responsible for all JavaFX scene switching in the application.
- * It keeps track of the currently logged-in user for the duration of the
- * session and hands that user (plus any other needed context, e.g. a
- * selected Resource) to each controller after its FXML is loaded, since
- * FXMLLoader instantiates controllers with a no-arg constructor and can't
- * pass constructor arguments itself.
- * <p>
- * Usage from LoginController (Member 1's module) once a user authenticates:
- * <pre>
- *     StageCoordinator.getInstance().showResourceList(authenticatedUser, currentStage); // Student/Staff
- *     StageCoordinator.getInstance().showAdminDashboard(authenticatedUser, currentStage); // Admin
- * </pre>
  */
 public class StageCoordinator {
 
     private static final String FXML_BASE = "/com/example/roomify/";
 
     private static StageCoordinator instance;
-
     private User currentUser;
 
     private StageCoordinator() {
-        // Private constructor: singleton
+        // Singleton pattern
     }
 
     public static synchronized StageCoordinator getInstance() {
@@ -52,75 +40,109 @@ public class StageCoordinator {
     }
 
     /**
-     * Navigate to the Resource List screen (default landing page for
-     * Students and Staff after login).
-     */
-    public void showResourceList(User user, Stage stage) {
-        this.currentUser = user;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_BASE + "resource-list-view.fxml"));
-            Parent root = loader.load();
-
-            ResourceListController controller = loader.getController();
-            controller.initContext(user);
-
-            switchScene(stage, root, "Roomify - Available Resources", 900, 600);
-        } catch (IOException e) {
-            System.err.println("Failed to load Resource List view: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Navigate to the Booking screen for a specific resource the user has
-     * chosen from the Resource List.
-     */
-    public void showBookingView(User user, Resource resource, Stage stage) {
-        this.currentUser = user;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_BASE + "booking-view.fxml"));
-            Parent root = loader.load();
-
-            BookingController controller = loader.getController();
-            controller.initContext(user, resource);
-
-            switchScene(stage, root, "Roomify - New Booking", 640, 520);
-        } catch (IOException e) {
-            System.err.println("Failed to load Booking view: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Navigate to the Admin Dashboard (default landing page for Admins
-     * after login).
+     * Navigate to the Admin Dashboard.
      */
     public void showAdminDashboard(User user, Stage stage) {
         this.currentUser = user;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_BASE + "admin-dashboard-view.fxml"));
+            FXMLLoader loader = createLoader("admin-dashboard-view.fxml");
             Parent root = loader.load();
 
             AdminDashboardController controller = loader.getController();
-            controller.initContext(user);
+            if (controller != null) {
+                controller.initContext(user);
+            }
 
             switchScene(stage, root, "Roomify - Admin Dashboard", 950, 650);
-        } catch (IOException e) {
-            System.err.println("Failed to load Admin Dashboard view: " + e.getMessage());
+        } catch (Exception e) {
+            handleLoadFailure("Admin Dashboard", e);
         }
     }
 
     /**
-     * Navigate back to the Login screen (e.g. on logout). Clears the
-     * current session's user reference.
+     * Navigate to the Resource List screen.
+     */
+    public void showResourceList(User user, Stage stage) {
+        this.currentUser = user;
+        try {
+            FXMLLoader loader = createLoader("resource-list-view.fxml");
+            Parent root = loader.load();
+
+            ResourceListController controller = loader.getController();
+            if (controller != null) {
+                controller.initContext(user);
+            }
+
+            switchScene(stage, root, "Roomify - Available Resources", 900, 600);
+        } catch (Exception e) {
+            handleLoadFailure("Resource List", e);
+        }
+    }
+
+    /**
+     * Navigate to the Booking screen.
+     */
+    public void showBookingView(User user, Resource resource, Stage stage) {
+        this.currentUser = user;
+        try {
+            FXMLLoader loader = createLoader("booking-view.fxml");
+            Parent root = loader.load();
+
+            BookingController controller = loader.getController();
+            if (controller != null) {
+                controller.initContext(user, resource);
+            }
+
+            switchScene(stage, root, "Roomify - New Booking", 640, 520);
+        } catch (Exception e) {
+            handleLoadFailure("Booking View", e);
+        }
+    }
+
+    /**
+     * Navigate back to the Login screen.
      */
     public void showLogin(Stage stage) {
         this.currentUser = null;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(FXML_BASE + "login-view.fxml"));
+            FXMLLoader loader = createLoader("login-view.fxml");
             Parent root = loader.load();
+
             switchScene(stage, root, "Roomify - Login", 700, 500);
-        } catch (IOException e) {
-            System.err.println("Failed to load Login view: " + e.getMessage());
+        } catch (Exception e) {
+            handleLoadFailure("Login View", e);
         }
+    }
+
+    /**
+     * Creates an FXMLLoader with fallback logic if the standard path isn't found.
+     */
+    private FXMLLoader createLoader(String fxmlFileName) throws IOException {
+        String primaryPath = FXML_BASE + fxmlFileName;
+        URL resourceUrl = getClass().getResource(primaryPath);
+
+        // Fallback search at root classpath
+        if (resourceUrl == null) {
+            resourceUrl = getClass().getResource("/" + fxmlFileName);
+        }
+
+        if (resourceUrl == null) {
+            throw new IOException("Could not locate FXML file: " + fxmlFileName);
+        }
+
+        return new FXMLLoader(resourceUrl);
+    }
+
+    /**
+     * Displays a uniform error dialog when a view fails to load.
+     */
+    private void handleLoadFailure(String viewName, Exception e) {
+        System.err.println("Failed to load " + viewName + ": " + e.getMessage());
+        e.printStackTrace();
+        AlertHelper.showError(
+                "Navigation Error",
+                "Failed to load " + viewName + ".\nDetails: " + e.getMessage()
+        );
     }
 
     private void switchScene(Stage stage, Parent root, String title, double width, double height) {

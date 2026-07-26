@@ -5,6 +5,7 @@ import com.example.roomify.exception.UnauthorizedAccessException;
 import com.example.roomify.model.Booking;
 import com.example.roomify.model.User;
 import com.example.roomify.security.AuthorizationGuard;
+import com.example.roomify.service.SessionManager;
 import com.example.roomify.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,21 +21,13 @@ import javafx.stage.Stage;
 import java.time.LocalDateTime;
 
 /**
- * Controller for AdminDashboardView.fxml.
- * <p>
- * Landing screen for Admins after login. Lists pending booking requests
- * and lets an Admin approve or reject them. Guards access using
- * Member 3's AuthorizationGuard, and delegates back to the shared
- * Resource List for day-to-day resource browsing.
- * <p>
- * NOTE: Approving/rejecting a booking here only updates the local table
- * for demo purposes. Member 4 owns ApprovalWorkflowService/AdminService,
- * which should be called from {@link #handleApprove} / {@link #handleReject}
- * once available, in place of the direct status mutation.
+ * Controller for admin-dashboard-view.fxml.
  */
 public class AdminDashboardController {
 
     @FXML private Label welcomeLabel;
+    @FXML private Label pendingCountLabel;
+    @FXML private Label statusLabel;
 
     @FXML private TableView<Booking> bookingTable;
     @FXML private TableColumn<Booking, String> resourceColumn;
@@ -53,6 +46,7 @@ public class AdminDashboardController {
 
     public void initContext(User user) {
         this.currentUser = user;
+        System.out.println("AdminDashboardController.initContext() called for: " + (user != null ? user.getName() : "null"));
 
         try {
             AuthorizationGuard.requireAdmin(user.getRole());
@@ -61,24 +55,34 @@ public class AdminDashboardController {
             return;
         }
 
-        welcomeLabel.setText("Admin Dashboard - " + user.getName());
+        if (welcomeLabel != null) {
+            welcomeLabel.setText("Welcome, " + user.getName());
+        }
+
         loadSampleBookings();
         bookingTable.setItems(bookings);
+        updatePendingCount();
+        System.out.println("AdminDashboard initialized successfully");
     }
 
     @FXML
     public void initialize() {
-        resourceColumn.setCellValueFactory(new PropertyValueFactory<>("resourceName"));
-        requesterColumn.setCellValueFactory(new PropertyValueFactory<>("requesterName"));
-        startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
-        endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        System.out.println("AdminDashboardController.initialize() called");
+        try {
+            resourceColumn.setCellValueFactory(new PropertyValueFactory<>("resourceName"));
+            requesterColumn.setCellValueFactory(new PropertyValueFactory<>("requesterName"));
+            startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+            endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+            statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+            System.out.println("Table columns initialized");
+        } catch (Exception e) {
+            System.err.println("Error initializing table columns: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
-     * TEMPORARY: sample pending bookings standing in for Member 5/6's
-     * persisted booking records. Replace with something like
-     * {@code BookingService.getInstance().getPendingBookings()}.
+     * TEMPORARY: sample pending bookings.
      */
     private void loadSampleBookings() {
         bookings.setAll(
@@ -93,6 +97,13 @@ public class AdminDashboardController {
         );
     }
 
+    private void updatePendingCount() {
+        long count = bookings.stream().filter(b -> "PENDING".equalsIgnoreCase(b.getStatus())).count();
+        if (pendingCountLabel != null) {
+            pendingCountLabel.setText("Pending: " + count);
+        }
+    }
+
     @FXML
     void handleApprove(ActionEvent event) {
         Booking selected = bookingTable.getSelectionModel().getSelectedItem();
@@ -100,10 +111,10 @@ public class AdminDashboardController {
             AlertHelper.showError("No Selection", "Please select a booking to approve.");
             return;
         }
-        // TODO (integration): replace with ApprovalWorkflowService.approve(selected)
         selected.setStatus("APPROVED");
         bookingTable.refresh();
-        AlertHelper.showInfo("Booking Approved", selected.getResourceName() + " booking approved.");
+        updatePendingCount();
+        AlertHelper.showInformation("Booking Approved", selected.getResourceName() + " booking approved.");
     }
 
     @FXML
@@ -113,10 +124,10 @@ public class AdminDashboardController {
             AlertHelper.showError("No Selection", "Please select a booking to reject.");
             return;
         }
-        // TODO (integration): replace with ApprovalWorkflowService.reject(selected)
         selected.setStatus("REJECTED");
         bookingTable.refresh();
-        AlertHelper.showInfo("Booking Rejected", selected.getResourceName() + " booking rejected.");
+        updatePendingCount();
+        AlertHelper.showInformation("Booking Rejected", selected.getResourceName() + " booking rejected.");
     }
 
     @FXML
@@ -126,8 +137,18 @@ public class AdminDashboardController {
     }
 
     @FXML
+    void handleRefresh(ActionEvent event) {
+        loadSampleBookings();
+        bookingTable.refresh();
+        updatePendingCount();
+        if (statusLabel != null) {
+            statusLabel.setText("Table Refreshed");
+        }
+    }
+
+    @FXML
     void handleLogout(ActionEvent event) {
-        currentUser.logout();
+        SessionManager.getInstance().logout();
         Stage currentStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         StageCoordinator.getInstance().showLogin(currentStage);
     }
