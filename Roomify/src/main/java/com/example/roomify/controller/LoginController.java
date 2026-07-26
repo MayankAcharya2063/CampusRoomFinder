@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import com.example.roomify.persistence.SystemLogger;
 
 public class LoginController {
 
@@ -56,14 +57,21 @@ public class LoginController {
             User authenticatedUser = authService.authenticate(email, password);
 
             if (authenticatedUser != null) {
+
                 // 5. Start Session
                 sessionManager.login(authenticatedUser);
-                showSuccessAlert("Login Successful", "Welcome back, " + authenticatedUser.getName() + "!");
 
-                // 6. Central Stage Routing Manager (Abrila's Module)
-                // NOTE: StageCoordinator is expected to be implemented later.
-                // The call below is structured to work with it seamlessly.
+                // Log successful login
+                SystemLogger.logLogin(authenticatedUser.getEmail());
+
+                showSuccessAlert(
+                        "Login Successful",
+                        "Welcome back, " + authenticatedUser.getName() + "!"
+                );
+
+                // Navigate to dashboard
                 navigateToDashboard(authenticatedUser, event);
+
             } else {
                 showErrorAlert("Authentication Failed", "Invalid username or password. Please try again.");
             }
