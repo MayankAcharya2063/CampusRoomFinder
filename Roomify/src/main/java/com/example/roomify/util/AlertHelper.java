@@ -2,6 +2,7 @@ package com.example.roomify.util;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 public class AlertHelper {
 
@@ -39,5 +40,15 @@ public class AlertHelper {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    /**
+     * Shows a confirmation dialog.
+     */
+    public static boolean showConfirmation(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        return alert.showAndWait().filter(b -> b == ButtonType.OK).isPresent();
     }
 }

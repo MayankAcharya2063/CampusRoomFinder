@@ -40,12 +40,12 @@ public class StageCoordinator {
     }
 
     /**
-     * Navigate to the Admin Dashboard.
+     * Navigate to the Admin Dashboard (single-window approach).
      */
     public void showAdminDashboard(User user, Stage stage) {
         this.currentUser = user;
         try {
-            FXMLLoader loader = createLoader("admin-dashboard-view.fxml");
+            FXMLLoader loader = createLoader("admin-dashboard.fxml");
             Parent root = loader.load();
 
             AdminDashboardController controller = loader.getController();
@@ -53,12 +53,11 @@ public class StageCoordinator {
                 controller.initContext(user);
             }
 
-            switchScene(stage, root, "Roomify - Admin Dashboard", 950, 650);
+            switchScene(stage, root, "Roomify - Admin Dashboard", 1100, 700);
         } catch (Exception e) {
             handleLoadFailure("Admin Dashboard", e);
         }
     }
-
     /**
      * Navigate to the Resource List screen.
      */
@@ -98,7 +97,47 @@ public class StageCoordinator {
             handleLoadFailure("Booking View", e);
         }
     }
+    /**
+     * Navigate to the Manage Users screen.
+     */
+    public void showManageUsers(Stage stage) {
+        try {
+            FXMLLoader loader = createLoader("manage-users-view.fxml");
+            Parent root = loader.load();
 
+            switchScene(stage, root, "Roomify - Manage Users", 950, 650);
+        } catch (Exception e) {
+            handleLoadFailure("Manage Users", e);
+        }
+    }
+
+    /**
+     * Navigate to the Booking Approval screen.
+     */
+    public void showApprovalDashboard(Stage stage) {
+        try {
+            FXMLLoader loader = createLoader("approval-view.fxml");
+            Parent root = loader.load();
+
+            switchScene(stage, root, "Roomify - Booking Approval", 1000, 650);
+        } catch (Exception e) {
+            handleLoadFailure("Booking Approval", e);
+        }
+    }
+
+    /**
+     * Navigate to the Reports screen.
+     */
+    public void showReports(Stage stage) {
+        try {
+            FXMLLoader loader = createLoader("report-view.fxml");
+            Parent root = loader.load();
+
+            switchScene(stage, root, "Roomify - Reports", 950, 650);
+        } catch (Exception e) {
+            handleLoadFailure("Reports", e);
+        }
+    }
     /**
      * Navigate back to the Login screen.
      */

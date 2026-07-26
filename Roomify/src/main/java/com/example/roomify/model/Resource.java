@@ -2,27 +2,37 @@ package com.example.roomify.model;
 
 import java.io.Serializable;
 
-/**
- * TEMPORARY placeholder until the real Resource class exists.
- * Field names match what the GUI needs, so swapping later should be easy.
- */
 public class Resource implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String resourceId;
     private String name;
-    private String type;      // e.g. "Study Room", "Lab", "Auditorium"
+    private String type;
     private int capacity;
-    private String status;    // e.g. "AVAILABLE", "UNAVAILABLE", "MAINTENANCE"
+    private String status;
+    private String location;  // ADD THIS FIELD
 
+    // Original constructor (keep for backward compatibility)
     public Resource(String resourceId, String name, String type, int capacity, String status) {
         this.resourceId = resourceId;
         this.name = name;
         this.type = type;
         this.capacity = capacity;
         this.status = status;
+        this.location = ""; // Default value
     }
 
+    // NEW CONSTRUCTOR with location parameter
+    public Resource(String resourceId, String name, String type, int capacity, String status, String location) {
+        this.resourceId = resourceId;
+        this.name = name;
+        this.type = type;
+        this.capacity = capacity;
+        this.status = status;
+        this.location = location;
+    }
+
+    // Getters and Setters
     public String getResourceId() { return resourceId; }
     public void setResourceId(String resourceId) { this.resourceId = resourceId; }
 
@@ -37,6 +47,9 @@ public class Resource implements Serializable {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getLocation() { return location; }  // ADD GETTER
+    public void setLocation(String location) { this.location = location; }  // ADD SETTER
 
     @Override
     public String toString() {
