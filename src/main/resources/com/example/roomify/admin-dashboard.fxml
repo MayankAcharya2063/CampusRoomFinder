@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0"
+            styleClass="root-pane"
+            stylesheets="@styles.css"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.roomify.controller.AdminDashboardController">
+
+    <!-- TOP HEADER -->
+    <top>
+        <HBox alignment="CENTER_LEFT" styleClass="header" spacing="10.0">
+            <children>
+                <Label text="Roomify Admin" styleClass="header-title" />
+                <Label text="Campus Resource &amp; Study Space Booking System" styleClass="header-subtitle" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="welcomeLabel" styleClass="header-user" text="Welcome, Admin" />
+                <Button fx:id="logoutButton" onAction="#handleLogout" styleClass="header-logout-btn" text="Logout" />
+            </children>
+            <padding>
+                <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox alignment="TOP_CENTER" styleClass="sidebar" spacing="4.0" prefWidth="220.0">
+            <padding>
+                <Insets bottom="16.0" left="12.0" right="12.0" top="16.0" />
+            </padding>
+            <children>
+                <!-- Dashboard Logo/Brand -->
+                <VBox alignment="CENTER" spacing="4.0" styleClass="sidebar-brand">
+                    <children>
+                        <Label styleClass="sidebar-brand-icon" text="🏫" />
+                        <Label styleClass="sidebar-brand-text" text="Roomify" />
+                    </children>
+                    <padding>
+                        <Insets bottom="16.0" top="8.0" />
+                    </padding>
+                </VBox>
+
+                <Separator styleClass="sidebar-separator" />
+
+                <!-- Navigation Buttons -->
+                <Button fx:id="dashboardBtn" onAction="#handleDashboard" styleClass="sidebar-btn-active" text="📊 Dashboard" />
+                <Button fx:id="resourcesBtn" onAction="#handleResources" styleClass="sidebar-btn" text="📋 Manage Resources" />
+                <Button fx:id="usersBtn" onAction="#handleUsers" styleClass="sidebar-btn" text="👥 Manage Users" />
+                <Button fx:id="approvalsBtn" onAction="#handleApprovals" styleClass="sidebar-btn" text="✅ Booking Approvals" />
+                <Button fx:id="reportsBtn" onAction="#handleReports" styleClass="sidebar-btn" text="📈 Reports" />
+                <Button fx:id="logsBtn" onAction="#handleLogs" styleClass="sidebar-btn" text="📜 System Logs" />
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Separator styleClass="sidebar-separator" />
+
+                <Button fx:id="logoutSidebarBtn" onAction="#handleLogout" styleClass="sidebar-btn-logout" text="🚪 Logout" />
+            </children>
+        </VBox>
+    </left>
+
+    <!-- CENTER CONTENT -->
+    <center>
+        <StackPane fx:id="contentStack" styleClass="content-area">
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+            </padding>
+        </StackPane>
+    </center>
+
+</BorderPane>

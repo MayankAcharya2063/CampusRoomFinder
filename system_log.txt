@@ -1,0 +1,25 @@
+[2026-07-26 21:37:35] User Login : admin@roomify.com
+[2026-07-26 21:41:04] User Login : staff@roomify.com
+[2026-07-26 21:42:20] User Login : admin@roomify.com
+[2026-07-26 21:51:35] User Login : admin@roomify.com
+[2026-07-26 21:53:48] User Logout : admin@roomify.com
+[2026-07-26 21:54:37] User Login : admin@roomify.com
+[2026-07-26 22:09:00] User Login : admin@roomify.com
+[2026-07-26 22:26:05] User Login : admin@roomify.com
+[2026-07-26 22:32:22] User Login : admin@roomify.com
+[2026-07-26 22:34:53] User Logout : admin@roomify.com
+[2026-07-26 22:36:36] User Login : staff@roomify.com
+[2026-07-26 22:37:07] Booking Created : BKG-1785084727163
+[2026-07-26 22:37:25] User Login : admin@roomify.com
+[2026-07-26 22:37:38] ADMIN ACTION : Booking Approved : BKG-1785084727163
+[2026-07-26 22:42:17] User Login : admin@roomify.com
+[2026-07-26 22:43:28] User Logout : admin@roomify.com
+[2026-07-26 22:43:42] User Login : staff@roomify.com
+[2026-07-26 22:44:08] Booking Created : BKG-1785085148487
+[2026-07-26 22:44:29] User Login : admin@roomify.com
+[2026-07-26 23:21:45] ADMIN ACTION : Booking Rejected : BKG-1785085148487. Reason: its booked
+[2026-07-27 09:38:17] User Login : admin@roomify.com
+[2026-07-27 09:44:33] User Logout : admin@roomify.com
+[2026-07-27 09:44:46] User Login : student@roomify.com
+[2026-07-27 09:45:05] Booking Created : BKG-1785124805395
+[2026-07-27 09:45:22] User Login : admin@roomify.com
