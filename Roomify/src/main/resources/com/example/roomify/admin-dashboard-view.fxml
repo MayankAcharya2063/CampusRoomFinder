@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="650.0" prefWidth="950.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.roomify.controller.AdminDashboardController">
+
+    <!-- Top Header Bar - Pink Theme -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10.0"
+              style="-fx-background-color: #880E4F; -fx-padding: 15px 25px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 2);">
+            <children>
+                <Label text="Roomify Admin" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="welcomeLabel" text="Welcome, Admin" style="-fx-text-fill: #FCE4EC;" />
+                <Button fx:id="logoutButton" onAction="#handleLogout" text="Logout"
+                        style="-fx-background-color: #D81B60; -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 16 6 16; -fx-background-radius: 6; -fx-cursor: hand;" />
+            </children>
+        </HBox>
+    </top>
+
+    <!-- Left Sidebar Navigation - Pink Theme -->
+    <left>
+        <VBox spacing="10.0" style="-fx-background-color: #AD1457; -fx-padding: 20px 10px;" prefWidth="180.0">
+            <children>
+                <Button fx:id="dashboardBtn" onAction="#handleDashboard" text="📊 Dashboard" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FCE4EC; -fx-font-size: 14px; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+                <Button fx:id="resourcesBtn" onAction="#handleResources" text="📦 Resources" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FCE4EC; -fx-font-size: 14px; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+                <Button fx:id="usersBtn" onAction="#handleUsers" text="👥 Manage Users" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FCE4EC; -fx-font-size: 14px; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+                <Button fx:id="approvalsBtn" onAction="#handleApprovals" text="✅ Approvals" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FCE4EC; -fx-font-size: 14px; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+                <Button fx:id="reportsBtn" onAction="#handleReports" text="📈 Reports" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FCE4EC; -fx-font-size: 14px; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+                <Button fx:id="logsBtn" onAction="#handleLogs" text="📋 Logs" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FCE4EC; -fx-font-size: 14px; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+                <Region VBox.vgrow="ALWAYS" />
+                <Button fx:id="logoutSidebarBtn" onAction="#handleLogout" text="🚪 Logout" maxWidth="Infinity"
+                        style="-fx-background-color: #880E4F; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-background-radius: 8; -fx-cursor: hand;" />
+            </children>
+        </VBox>
+    </left>
+
+    <!-- Center Content Area -->
+    <center>
+        <StackPane fx:id="contentStack" style="-fx-background-color: #FFF5F8;">
+            <padding>
+                <Insets bottom="20.0" left="25.0" right="25.0" top="15.0" />
+            </padding>
+            <!-- Default content when dashboard loads -->
+            <VBox spacing="12.0" style="-fx-background-color: #FFF5F8;">
+                <children>
+                    <!-- Stats Cards Row -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #F8BBD0; -fx-border-radius: 12; -fx-padding: 16px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="📦" style="-fx-font-size: 24px;" />
+                                    <Label fx:id="availableResourcesLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                                    <Label text="Available Resources" style="-fx-text-fill: #AD1457; -fx-font-size: 12px;" />
+                                </children>
+                            </VBox>
+                            <VBox style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #F8BBD0; -fx-border-radius: 12; -fx-padding: 16px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="👥" style="-fx-font-size: 24px;" />
+                                    <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                                    <Label text="Total Users" style="-fx-text-fill: #AD1457; -fx-font-size: 12px;" />
+                                </children>
+                            </VBox>
+                            <VBox style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #F8BBD0; -fx-border-radius: 12; -fx-padding: 16px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="⏳" style="-fx-font-size: 24px;" />
+                                    <Label fx:id="pendingBookingsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;" />
+                                    <Label text="Pending Bookings" style="-fx-text-fill: #AD1457; -fx-font-size: 12px;" />
+                                </children>
+                            </VBox>
+                            <VBox style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #F8BBD0; -fx-border-radius: 12; -fx-padding: 16px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="✅" style="-fx-font-size: 24px;" />
+                                    <Label fx:id="approvedBookingsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #10B981;" />
+                                    <Label text="Approved" style="-fx-text-fill: #AD1457; -fx-font-size: 12px;" />
+                                </children>
+                            </VBox>
+                            <VBox style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-border-color: #F8BBD0; -fx-border-radius: 12; -fx-padding: 16px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="📅" style="-fx-font-size: 24px;" />
+                                    <Label fx:id="todayBookingsLabel" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3B82F6;" />
+                                    <Label text="Today's Bookings" style="-fx-text-fill: #AD1457; -fx-font-size: 12px;" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+
+                    <!-- Pending Approvals Header -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <children>
+                            <Label text="📋 Pending Approval Requests" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label fx:id="pendingCountLabel" text="Pending: 0" style="-fx-font-weight: bold; -fx-text-fill: #AD1457; -fx-font-size: 14px;" />
+                        </children>
+                    </HBox>
+
+                    <!-- Booking Table -->
+                    <TableView fx:id="bookingTable" VBox.vgrow="ALWAYS" prefHeight="250.0"
+                               style="-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-border-color: #F8BBD0; -fx-border-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);">
+                        <columns>
+                            <TableColumn fx:id="resourceColumn" prefWidth="180.0" text="Resource"
+                                         style="-fx-background-color: #FCE4EC; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                            <TableColumn fx:id="requesterColumn" prefWidth="150.0" text="Requester"
+                                         style="-fx-background-color: #FCE4EC; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                            <TableColumn fx:id="startColumn" prefWidth="180.0" text="Start Time"
+                                         style="-fx-background-color: #FCE4EC; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                            <TableColumn fx:id="endColumn" prefWidth="180.0" text="End Time"
+                                         style="-fx-background-color: #FCE4EC; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                            <TableColumn fx:id="statusColumn" prefWidth="110.0" text="Status"
+                                         style="-fx-background-color: #FCE4EC; -fx-font-weight: bold; -fx-text-fill: #880E4F;" />
+                        </columns>
+                    </TableView>
+
+                    <!-- Bottom Action Bar -->
+                    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                        <children>
+                            <Label fx:id="statusLabel" text="Ready" style="-fx-text-fill: #AD1457;" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button fx:id="refreshButton" onAction="#handleRefresh" text="🔄 Refresh"
+                                    style="-fx-background-color: #FCE4EC; -fx-text-fill: #880E4F; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 6; -fx-cursor: hand;" />
+                            <Button fx:id="rejectButton" onAction="#handleReject" text="❌ Reject"
+                                    style="-fx-background-color: #D81B60; -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 6; -fx-cursor: hand;" />
+                            <Button fx:id="approveButton" onAction="#handleApprove" text="✅ Approve"
+                                    style="-fx-background-color: #10B981; -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 20 8 20; -fx-background-radius: 6; -fx-cursor: hand;" />
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>

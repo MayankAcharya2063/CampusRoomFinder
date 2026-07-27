@@ -1,11 +1,8 @@
-<<<<<<< HEAD
 # Maven
 target/
 
 !.mvn/wrapper/maven-wrapper.jar
 
-=======
->>>>>>> efe131dd8e4424dd76083742e09cf0033319083f
 # IntelliJ
 .idea/
 **/.idea/
@@ -14,7 +11,6 @@ target/
 *.ipr
 *.iws
 
-<<<<<<< HEAD
 # Eclipse
 .project
 .classpath
@@ -36,16 +32,3 @@ dist/
 
 # Archives
 *.zip
-=======
-# VS Code
-.vscode/
-
-# Mac
-.DS_Store
-
-# Archives
-*.zip
-
-# Logs
-*.log
->>>>>>> efe131dd8e4424dd76083742e09cf0033319083f

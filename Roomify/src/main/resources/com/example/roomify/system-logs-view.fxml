@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+
+<VBox spacing="16.0" xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.roomify.controller.SystemLogsController">
+
+    <children>
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <children>
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1E293B;" text="System Logs" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label text="Total Logs: " style="-fx-text-fill: #64748B;" />
+                <Label fx:id="totalLogsLabel" style="-fx-font-weight: bold; -fx-text-fill: #1E293B;" text="0" />
+            </children>
+        </HBox>
+
+        <!-- Search Bar -->
+        <HBox spacing="12.0">
+            <children>
+                <TextField fx:id="searchField" promptText="Search logs..." HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleSearch" styleClass="btn-secondary" text="🔍 Search" />
+            </children>
+        </HBox>
+
+        <!-- Log Table -->
+        <TableView fx:id="logTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="timestampColumn" prefWidth="180.0" text="Timestamp" />
+                <TableColumn fx:id="actionColumn" prefWidth="150.0" text="Action" />
+                <TableColumn fx:id="userColumn" prefWidth="150.0" text="User" />
+                <TableColumn fx:id="descriptionColumn" prefWidth="350.0" text="Description" />
+            </columns>
+        </TableView>
+
+        <!-- Action Buttons -->
+        <HBox spacing="12.0">
+            <children>
+                <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh" />
+                <Button onAction="#handleExportLogs" styleClass="btn-secondary" text="📤 Export Logs" />
+                <Button onAction="#handleClearLogs" styleClass="btn-danger" text="🗑️ Clear Logs" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="statusLabel" style="-fx-text-fill: #64748B;" text="Ready" />
+            </children>
+        </HBox>
+    </children>
+
+    <padding>
+        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+    </padding>
+</VBox>
