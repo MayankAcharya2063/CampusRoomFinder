@@ -6,6 +6,7 @@ import com.example.roomify.model.Staff;
 import com.example.roomify.model.Student;
 import com.example.roomify.model.User;
 import com.example.roomify.persistence.UserFileHandler;
+import com.example.roomify.security.PasswordEncoder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +49,9 @@ public class AuthenticationService {
 
     // Default seed data used only on first run, before users.dat exists
     private void loadDummyUsers() {
-        userDatabase.put("admin@roomify.com", new Admin("A001", "Admin User", "admin@roomify.com", "admin123", 1));
-        userDatabase.put("staff@roomify.com", new Staff("S001", "Staff User", "staff@roomify.com", "staff123", "STF01", "Engineering"));
-        userDatabase.put("student@roomify.com", new Student("ST001", "Student User", "student@roomify.com", "student123", "ST01", "Computer Science"));
+        userDatabase.put("admin@roomify.com", new Admin("A001", "Admin User", "admin@roomify.com", PasswordEncoder.encode("admin123"), 1));
+        userDatabase.put("staff@roomify.com", new Staff("S001", "Staff User", "staff@roomify.com", PasswordEncoder.encode("staff123"), "STF01", "Engineering"));
+        userDatabase.put("student@roomify.com", new Student("ST001", "Student User", "student@roomify.com", PasswordEncoder.encode("student123"), "ST01", "Computer Science"));
     }
 
     /**
@@ -64,6 +65,9 @@ public class AuthenticationService {
      * Registers a new user and persists the updated user list to file.
      */
     public void registerUser(User user) {
+        if (user != null && user.getPassword() != null) {
+            user.setPassword(PasswordEncoder.encode(user.getPassword()));
+        }
         userDatabase.put(user.getEmail().toLowerCase(), user);
         persistUsers();
     }
@@ -76,10 +80,18 @@ public class AuthenticationService {
         // Case-insensitive email lookup
         User user = userDatabase.get(email.toLowerCase());
 
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && PasswordEncoder.matches(password, user.getPassword())) {
             return user;
         }
         return null;
+    }
+
+    /**
+     * Updates an existing user's data in memory and persists to disk.
+     */
+    public void updateUser(User user) {
+        userDatabase.put(user.getEmail().toLowerCase(), user);
+        persistUsers();
     }
 
     /**

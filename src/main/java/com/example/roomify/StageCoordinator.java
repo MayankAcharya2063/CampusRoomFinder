@@ -3,6 +3,8 @@ package com.example.roomify;
 import com.example.roomify.controller.AdminDashboardController;
 import com.example.roomify.controller.BookingController;
 import com.example.roomify.controller.ResourceListController;
+import com.example.roomify.controller.StaffDashboardController;
+import com.example.roomify.controller.StudentDashboardController;
 import com.example.roomify.model.Resource;
 import com.example.roomify.model.User;
 import com.example.roomify.util.AlertHelper;
@@ -58,6 +60,73 @@ public class StageCoordinator {
             handleLoadFailure("Admin Dashboard", e);
         }
     }
+
+    /**
+     * Navigate to the Staff Dashboard.
+     */
+    public void showStaffDashboard(User user, Stage stage) {
+        this.currentUser = user;
+        try {
+            FXMLLoader loader = createLoader("staff-dashboard-view.fxml");
+            Parent root = loader.load();
+
+            StaffDashboardController controller = loader.getController();
+            if (controller != null) {
+                controller.initContext(user);
+            }
+
+            switchScene(stage, root, "Roomify - Staff Dashboard", 1100, 700);
+        } catch (Exception e) {
+            handleLoadFailure("Staff Dashboard", e);
+        }
+    }
+
+    /**
+     * Navigate to the Student Dashboard.
+     */
+    public void showStudentDashboard(User user, Stage stage) {
+        this.currentUser = user;
+        try {
+            FXMLLoader loader = createLoader("student-dashboard-view.fxml");
+            Parent root = loader.load();
+
+            StudentDashboardController controller = loader.getController();
+            if (controller != null) {
+                controller.initContext(user);
+            }
+
+            switchScene(stage, root, "Roomify - Student Dashboard", 1100, 700);
+        } catch (Exception e) {
+            handleLoadFailure("Student Dashboard", e);
+        }
+    }
+
+    /**
+     * Route user to their role-specific dashboard.
+     */
+    public void showDashboardForUser(User user, Stage stage) {
+        if (user == null) {
+            showLogin(stage);
+            return;
+        }
+        if (user.getRole() == null) {
+            showLogin(stage);
+            return;
+        }
+        switch (user.getRole()) {
+            case ADMIN:
+                showAdminDashboard(user, stage);
+                break;
+            case STAFF:
+                showStaffDashboard(user, stage);
+                break;
+            case STUDENT:
+                showStudentDashboard(user, stage);
+                break;
+            default:
+                showLogin(stage);
+        }
+    }
     /**
      * Navigate to the Resource List screen.
      */
@@ -97,19 +166,7 @@ public class StageCoordinator {
             handleLoadFailure("Booking View", e);
         }
     }
-    /**
-     * Navigate to the Manage Users screen.
-     */
-    public void showManageUsers(Stage stage) {
-        try {
-            FXMLLoader loader = createLoader("manage-users-view.fxml");
-            Parent root = loader.load();
 
-            switchScene(stage, root, "Roomify - Manage Users", 950, 650);
-        } catch (Exception e) {
-            handleLoadFailure("Manage Users", e);
-        }
-    }
 
     /**
      * Navigate to the Booking Approval screen.

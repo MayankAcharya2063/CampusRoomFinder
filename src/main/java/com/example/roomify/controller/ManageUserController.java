@@ -2,6 +2,11 @@ package com.example.roomify.controller;
 
 import com.example.roomify.StageCoordinator;
 import com.example.roomify.model.User;
+import com.example.roomify.model.Admin;
+import com.example.roomify.model.Staff;
+import com.example.roomify.model.Student;
+import com.example.roomify.persistence.UserFileHandler;
+import com.example.roomify.service.AuthenticationService;
 import com.example.roomify.service.SessionManager;
 import com.example.roomify.util.AlertFactory;
 import com.example.roomify.util.AlertHelper;
@@ -124,21 +129,20 @@ public class ManageUserController {
     }
 
     private void loadUsers() {
-        List<UserRow> userList = generatePlaceholderUsers();
+        List<User> users = UserFileHandler.loadUsers();
+        List<UserRow> userList = new ArrayList<>();
+        for (User u : users) {
+            String dept = "Administration";
+            if (u instanceof Staff) {
+                dept = ((Staff) u).getDepartment();
+            } else if (u instanceof Student) {
+                dept = ((Student) u).getDepartment();
+            }
+            userList.add(new UserRow(u.getUserId(), u.getName(), u.getEmail(), u.getRole().name(), dept));
+        }
         allUsers.setAll(userList);
         filteredUsers = new FilteredList<>(allUsers, p -> true);
         userTable.setItems(filteredUsers);
-    }
-
-    private List<UserRow> generatePlaceholderUsers() {
-        List<UserRow> users = new ArrayList<>();
-        users.add(new UserRow("U001", "Admin User", "admin@roomify.com", "ADMIN", "Administration"));
-        users.add(new UserRow("U002", "John Staff", "john.staff@roomify.com", "STAFF", "Computer Science"));
-        users.add(new UserRow("U003", "Jane Student", "jane.student@roomify.com", "STUDENT", "Engineering"));
-        users.add(new UserRow("U004", "Michael Lee", "michael.lee@roomify.com", "STAFF", "Mathematics"));
-        users.add(new UserRow("U005", "Sarah Chen", "sarah.chen@roomify.com", "STUDENT", "Business"));
-        users.add(new UserRow("U006", "David Kumar", "david.kumar@roomify.com", "STUDENT", "Computer Science"));
-        return users;
     }
 
     private void setupTableSelectionListener() {
@@ -232,15 +236,21 @@ public class ManageUserController {
             return;
         }
 
-        UserRow newUser = new UserRow(
-                userId,
-                nameField.getText().trim(),
-                emailField.getText().trim(),
-                roleComboBox.getValue(),
-                departmentField.getText().trim()
-        );
+        String rawPassword = passwordField.getText().trim();
+        if (rawPassword.isEmpty()) rawPassword = "password123";
 
-        allUsers.add(newUser);
+        String roleStr = roleComboBox.getValue();
+        User newUserObj;
+        if ("ADMIN".equalsIgnoreCase(roleStr)) {
+            newUserObj = new Admin(userId, nameField.getText().trim(), emailField.getText().trim(), rawPassword, 1);
+        } else if ("STAFF".equalsIgnoreCase(roleStr)) {
+            newUserObj = new Staff(userId, nameField.getText().trim(), emailField.getText().trim(), rawPassword, userId, departmentField.getText().trim());
+        } else {
+            newUserObj = new Student(userId, nameField.getText().trim(), emailField.getText().trim(), rawPassword, userId, departmentField.getText().trim());
+        }
+
+        AuthenticationService.getInstance().registerUser(newUserObj);
+        loadUsers();
         clearForm();
         AlertHelper.showInformation("Success", "User added successfully.");
     }
@@ -294,7 +304,10 @@ public class ManageUserController {
                 "Are you sure you want to delete '" + selected.getName() + "'?");
 
         if (confirm) {
-            allUsers.remove(selected);
+            List<User> stored = UserFileHandler.loadUsers();
+            stored.removeIf(u -> u.getUserId().equalsIgnoreCase(selected.getUserId()) || u.getEmail().equalsIgnoreCase(selected.getEmail()));
+            UserFileHandler.saveUsers(stored);
+            loadUsers();
             clearForm();
             AlertHelper.showInformation("Success", "User deleted successfully.");
         }

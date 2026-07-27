@@ -86,3 +86,17 @@
 [2026-07-26 20:59:15] ADMIN ACTION : Resource Added: RES-006
 [2026-07-26 20:59:21] ADMIN ACTION : Resource Edited: RES-006
 >>>>>>> efe131dd8e4424dd76083742e09cf0033319083f
+[2026-07-27 12:45:48] User Login : admin@roomify.com
+[2026-07-27 12:46:32] ADMIN ACTION : Booking Approved : BKG-1785124805395
+[2026-07-27 12:47:19] User Logout : admin@roomify.com
+[2026-07-27 12:55:28] User Login : admin@roomify.com
+[2026-07-27 13:01:53] User Login : admin@roomify.com
+[2026-07-27 13:02:59] User Logout : admin@roomify.com
+[2026-07-27 13:03:12] User Login : bruce@roomify.com
+[2026-07-27 13:15:51] User Login : bruce@roomify.com
+[2026-07-27 13:16:40] Booking Created : BKG-1785137500029
+[2026-07-27 13:16:49] User Logout : bruce@roomify.com
+[2026-07-27 13:17:02] User Login : admin@roomify.com
+[2026-07-27 13:17:20] ADMIN ACTION : Booking Rejected : BKG-1785137500029. Reason: no club
+[2026-07-27 13:17:23] User Logout : admin@roomify.com
+[2026-07-27 13:17:39] User Login : bruce@roomify.com

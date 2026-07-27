@@ -103,7 +103,7 @@ public class BookingController {
             );
 
             Stage currentStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            StageCoordinator.getInstance().showResourceList(currentUser, currentStage);
+            StageCoordinator.getInstance().showDashboardForUser(currentUser, currentStage);
 
         } catch (InvalidBookingDurationException e) {
             AlertHelper.showError("Invalid Duration", e.getMessage());
@@ -140,6 +140,6 @@ public class BookingController {
     @FXML
     void handleCancel(ActionEvent event) {
         Stage currentStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        StageCoordinator.getInstance().showResourceList(currentUser, currentStage);
+        StageCoordinator.getInstance().showDashboardForUser(currentUser, currentStage);
     }
 }

@@ -101,11 +101,11 @@ public class LoginController {
                 break;
             case STAFF:
                 System.out.println("Loading Staff Dashboard...");
-                StageCoordinator.getInstance().showResourceList(user, currentStage);
+                StageCoordinator.getInstance().showStaffDashboard(user, currentStage);
                 break;
             case STUDENT:
                 System.out.println("Loading Student Dashboard...");
-                StageCoordinator.getInstance().showResourceList(user, currentStage);
+                StageCoordinator.getInstance().showStudentDashboard(user, currentStage);
                 break;
             default:
                 AlertHelper.showError("Navigation Error", "Unknown user role. Cannot load dashboard.");

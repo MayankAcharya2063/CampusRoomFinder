@@ -2,6 +2,7 @@ package com.example.roomify.controller;
 
 import com.example.roomify.model.Resource;
 import com.example.roomify.model.User;
+import com.example.roomify.persistence.ResourceFileHandler;
 import com.example.roomify.util.AlertFactory;
 import com.example.roomify.util.AlertHelper;
 import com.example.roomify.validation.InputValidator;
@@ -48,17 +49,15 @@ public class ManageResourceController {
         this.currentUser = user;
         setupComboBoxes();
         setupTableColumns();
-        loadSampleResources();
+        loadResources();
         setupTableSelectionListener();
     }
 
-
-    // Add this to your ManageResourceController.java initialize() method
     @FXML
     public void initialize() {
         setupComboBoxes();
         setupTableColumns();
-        loadSampleResources();
+        loadResources();
         setupTableSelectionListener();
 
         // Add row selection styling
@@ -130,14 +129,21 @@ public class ManageResourceController {
         });
     }
 
-    private void loadSampleResources() {
-        allResources.setAll(
-                new Resource("RES-001", "Study Room 3A", "Study Room", 4, "AVAILABLE", "Library Building"),
-                new Resource("RES-002", "Computer Lab C", "Computer Lab", 30, "AVAILABLE", "BCS Block"),
-                new Resource("RES-003", "Main Auditorium", "Auditorium", 200, "UNDER_MAINTENANCE", "Main Hall"),
-                new Resource("RES-004", "Discussion Room 2B", "Discussion Room", 8, "AVAILABLE", "Block A"),
-                new Resource("RES-005", "Conference Room", "Conference Room", 15, "BOOKED", "Admin Building")
-        );
+    private void loadResources() {
+        List<Resource> loaded = ResourceFileHandler.loadResources();
+        if (loaded != null && !loaded.isEmpty()) {
+            allResources.setAll(loaded);
+        } else {
+            // Default seed resources if resources.dat does not exist yet
+            allResources.setAll(
+                    new Resource("RES-001", "Study Room 3A", "Study Room", 4, "AVAILABLE", "Library Building"),
+                    new Resource("RES-002", "Computer Lab C", "Computer Lab", 30, "AVAILABLE", "BCS Block"),
+                    new Resource("RES-003", "Main Auditorium", "Auditorium", 200, "UNDER_MAINTENANCE", "Main Hall"),
+                    new Resource("RES-004", "Discussion Room 2B", "Discussion Room", 8, "AVAILABLE", "Block A"),
+                    new Resource("RES-005", "Conference Room", "Conference Room", 15, "BOOKED", "Admin Building")
+            );
+            ResourceFileHandler.saveResources(new ArrayList<>(allResources));
+        }
 
         filteredResources = new FilteredList<>(allResources, p -> true);
         resourceTable.setItems(filteredResources);
@@ -241,6 +247,7 @@ public class ManageResourceController {
         );
 
         allResources.add(resource);
+        ResourceFileHandler.saveResources(new ArrayList<>(allResources));
         clearForm();
         AlertHelper.showInformation("Success", "Resource added successfully.");
     }
@@ -270,6 +277,7 @@ public class ManageResourceController {
                 locationField.getText().trim()
         );
         allResources.add(updated);
+        ResourceFileHandler.saveResources(new ArrayList<>(allResources));
         resourceTable.refresh();
         clearForm();
         AlertHelper.showInformation("Success", "Resource updated successfully.");
@@ -288,6 +296,7 @@ public class ManageResourceController {
 
         if (confirm) {
             allResources.remove(selected);
+            ResourceFileHandler.saveResources(new ArrayList<>(allResources));
             clearForm();
             AlertHelper.showInformation("Success", "Resource deleted successfully.");
         }

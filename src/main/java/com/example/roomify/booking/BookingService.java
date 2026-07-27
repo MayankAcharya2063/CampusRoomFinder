@@ -21,7 +21,7 @@ public class BookingService {
     // Stores all bookings in memory, seeded from disk on startup
     private final List<Booking> bookings;
 
-    private BookingService() {
+    public BookingService() {
         List<Booking> loaded = BookingFileHandler.loadBookings();
         this.bookings = new ArrayList<>(loaded);
     }
@@ -129,5 +129,8 @@ public class BookingService {
      */
     public List<Booking> getBookings() {
         return bookings;
+    }
+
+    public void refreshBookings() {
     }
 }
