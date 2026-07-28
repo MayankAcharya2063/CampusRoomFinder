@@ -20,6 +20,13 @@ public class BookingValidator {
                                        LocalDateTime endTime)
             throws InvalidBookingDurationException {
 
+        // Booking start time must not be in the past
+        if (startTime.isBefore(LocalDateTime.now())) {
+            throw new InvalidBookingDurationException(
+                    "Booking start time cannot be in the past."
+            );
+        }
+
         // End time must be after start time
         if (endTime.isBefore(startTime) || endTime.isEqual(startTime)) {
             throw new InvalidBookingDurationException(
