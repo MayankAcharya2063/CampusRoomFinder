@@ -3,7 +3,6 @@ package com.example.roomify.controller;
 import com.example.roomify.model.Resource;
 import com.example.roomify.model.User;
 import com.example.roomify.persistence.ResourceFileHandler;
-import com.example.roomify.util.AlertFactory;
 import com.example.roomify.util.AlertHelper;
 import com.example.roomify.validation.InputValidator;
 import javafx.collections.FXCollections;
@@ -266,18 +265,44 @@ public class ManageResourceController {
             return;
         }
 
-        // Remove old and add updated
-        allResources.remove(selected);
-        Resource updated = new Resource(
-                resourceIdField.getText().trim(),
-                nameField.getText().trim(),
-                typeComboBox.getValue(),
-                Integer.parseInt(capacityField.getText().trim()),
-                statusComboBox.getValue(),
-                locationField.getText().trim()
-        );
-        allResources.add(updated);
+        // Get the new ID from the form
+        String newId = resourceIdField.getText().trim();
+        String oldId = selected.getResourceId();
+
+        // If the ID is changing, check for duplicates
+        if (!newId.equals(oldId)) {
+            boolean exists = allResources.stream()
+                    .anyMatch(r -> r.getResourceId().equalsIgnoreCase(newId) && r != selected);
+            if (exists) {
+                AlertHelper.showError("Duplicate ID", "Resource with ID '" + newId + "' already exists.");
+                return;
+            }
+        }
+
+        // Update the existing object's properties
+        selected.setResourceId(newId);
+        selected.setName(nameField.getText().trim());
+        selected.setType(typeComboBox.getValue());
+        selected.setCapacity(Integer.parseInt(capacityField.getText().trim()));
+        selected.setStatus(statusComboBox.getValue());
+        selected.setLocation(locationField.getText().trim());
+
+        // Save to file
         ResourceFileHandler.saveResources(new ArrayList<>(allResources));
+
+        // CRITICAL: Update the filtered list to reflect changes
+        // This forces the FilteredList to re-evaluate all items
+        filteredResources.setPredicate(resource -> true);
+        filteredResources.setPredicate(resource -> {
+            String query = searchField.getText().toLowerCase().trim();
+            if (query.isEmpty()) return true;
+            return resource.getResourceId().toLowerCase().contains(query) ||
+                    resource.getName().toLowerCase().contains(query) ||
+                    resource.getType().toLowerCase().contains(query) ||
+                    resource.getLocation().toLowerCase().contains(query);
+        });
+
+        // Refresh the table
         resourceTable.refresh();
         clearForm();
         AlertHelper.showInformation("Success", "Resource updated successfully.");
@@ -306,8 +331,4 @@ public class ManageResourceController {
     private void handleClearFields(ActionEvent event) {
         clearForm();
     }
-
-    // ==================== INNER CLASS - Extended Resource ====================
-    // Note: The Resource model class needs to be extended with 'location' field
-    // If not, we'll use a wrapper or modify the existing Resource class
 }
