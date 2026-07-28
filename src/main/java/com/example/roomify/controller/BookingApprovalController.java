@@ -100,6 +100,7 @@ public class BookingApprovalController {
     }
 
     private void loadRealBookings() {
+        BookingService.getInstance().refreshBookings(); // reload from disk so admin always sees the latest bookings
         bookings.setAll(BookingService.getInstance().getBookings());
         bookingTable.setItems(bookings);
     }

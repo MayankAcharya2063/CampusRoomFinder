@@ -36,7 +36,7 @@ public class MyBookingsController {
     @FXML private Button cancelButton;
 
     private final SessionManager sessionManager = SessionManager.getInstance();
-    private final BookingService bookingService = new BookingService();
+    private final BookingService bookingService = BookingService.getInstance();
     private User currentUser;
     private ObservableList<Booking> userBookings = FXCollections.observableArrayList();
     private FilteredList<Booking> filteredBookings;
@@ -89,6 +89,7 @@ public class MyBookingsController {
     }
 
     private void loadBookings() {
+        bookingService.refreshBookings(); // reload from disk so Refresh actually picks up new bookings
         userBookings.clear();
         List<Booking> allBookings = bookingService.getBookings();
 

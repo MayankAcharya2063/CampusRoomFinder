@@ -130,6 +130,7 @@ public class BookingController {
                 bookingId,
                 user.getUserId(),
                 resource.getResourceId(),
+                resource.getName(),
                 start,
                 end,
                 user.getName()

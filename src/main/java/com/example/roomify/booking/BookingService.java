@@ -39,6 +39,7 @@ public class BookingService {
     public void createBooking(String bookingID,
                               String userID,
                               String resourceID,
+                              String resourceName,
                               LocalDateTime startTime,
                               LocalDateTime endTime,
                               String creatorName)
@@ -59,7 +60,7 @@ public class BookingService {
         Booking booking = new Booking(
                 bookingID,
                 resourceID,
-                "Study Room",      // temporary resource name
+                resourceName,      // actual resource name, was hardcoded "Study Room"
                 creatorName,       // requester name
                 startTime,
                 endTime,
@@ -128,6 +129,7 @@ public class BookingService {
     }
 
     public void refreshBookings() {
-        // Method intentionally left blank - refresh logic handled elsewhere
+        bookings.clear();
+        bookings.addAll(BookingFileHandler.loadBookings());
     }
 }

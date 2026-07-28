@@ -6,6 +6,7 @@ import com.example.roomify.model.Admin;
 import com.example.roomify.model.Staff;
 import com.example.roomify.model.Student;
 import com.example.roomify.persistence.UserFileHandler;
+import com.example.roomify.security.PasswordEncoder;
 import com.example.roomify.service.AuthenticationService;
 import com.example.roomify.service.SessionManager;
 import com.example.roomify.util.AlertFactory;
@@ -325,6 +326,21 @@ public class ManageUserController {
                 "Reset password for '" + selected.getName() + "'?");
 
         if (confirm) {
+            List<User> stored = UserFileHandler.loadUsers();
+            User match = stored.stream()
+                    .filter(u -> u.getUserId().equalsIgnoreCase(selected.getUserId())
+                            || u.getEmail().equalsIgnoreCase(selected.getEmail()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (match == null) {
+                AlertHelper.showError("Error", "Could not find that user to reset their password.");
+                return;
+            }
+
+            match.setPassword(PasswordEncoder.encode("temp1234"));
+            UserFileHandler.saveUsers(stored);
+
             AlertHelper.showInformation("Password Reset",
                     "Password for '" + selected.getName() + "' has been reset.\n" +
                             "Temporary password: 'temp1234'");

@@ -1,6 +1,7 @@
 package com.example.roomify.validation;
 
 import com.example.roomify.model.User;
+import com.example.roomify.security.PasswordEncoder;
 import com.example.roomify.service.ResourceStatusManager;
 
 import java.time.LocalDateTime;
@@ -375,7 +376,7 @@ public class FormValidator {
             }
 
             // Verify current password
-            if (user != null && !user.getPassword().equals(currentPassword)) {
+            if (user != null && !PasswordEncoder.matches(currentPassword, user.getPassword())) {
                 return ValidationResult.failure("Current password is incorrect.");
             }
 
@@ -385,7 +386,7 @@ public class FormValidator {
             }
 
             // New password must be different from current
-            if (user != null && user.getPassword().equals(newPassword)) {
+            if (user != null && PasswordEncoder.matches(newPassword, user.getPassword())) {
                 return ValidationResult.failure("New password must be different from current password.");
             }
         }

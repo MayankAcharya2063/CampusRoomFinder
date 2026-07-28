@@ -2,6 +2,7 @@ package com.example.roomify.controller;
 
 import com.example.roomify.model.User;
 import com.example.roomify.service.AuthenticationService;
+import com.example.roomify.security.PasswordEncoder;
 import com.example.roomify.service.SessionManager;
 import com.example.roomify.util.AlertHelper;
 import com.example.roomify.validation.InputValidator;
@@ -53,7 +54,7 @@ public class ProfileController {
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        if (!currentUser.getPassword().equals(currentPassword)) {
+        if (!PasswordEncoder.matches(currentPassword, currentUser.getPassword())) {
             AlertHelper.showError("Error", "Current password is incorrect.");
             return;
         }
@@ -74,7 +75,7 @@ public class ProfileController {
             return;
         }
 
-        currentUser.setPassword(newPassword);
+        currentUser.setPassword(PasswordEncoder.encode(newPassword));
         authService.updateUser(currentUser);
 
         currentPasswordField.clear();

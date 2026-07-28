@@ -49,7 +49,7 @@ public class StaffDashboardController {
     @FXML private TableColumn<Booking, String> statusColumn;
 
     private final SessionManager sessionManager = SessionManager.getInstance();
-    private final BookingService bookingService = new BookingService();
+    private final BookingService bookingService = BookingService.getInstance();
     private User currentUser;
 
     private static final String ACTIVE_STYLE = "sidebar-btn-active";
@@ -111,6 +111,7 @@ public class StaffDashboardController {
 
     private void loadDashboardData() {
         try {
+            bookingService.refreshBookings(); // reload from disk so this always reflects the latest state
             List<Resource> resources = ResourceFileHandler.loadResources();
             long availableCount = 0;
             if (resources != null) {

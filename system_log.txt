@@ -133,3 +133,12 @@
 [2026-07-28 13:04:00] Booking Cancelled : BKG-1785223090906
 [2026-07-28 13:04:09] User Logout : student@roomify.com
 [2026-07-28 13:04:17] User Login : admin@roomify.com
+[2026-07-28 13:26:13] User Login : student@roomify.com
+[2026-07-28 13:26:34] Booking Created : BKG-1785224494209
+[2026-07-28 13:42:16] User Login : student@roomify.com
+[2026-07-28 13:42:41] Booking Created : BKG-1785225461057
+[2026-07-28 13:42:52] User Logout : student@roomify.com
+[2026-07-28 13:43:03] User Login : admin@roomify.com
+[2026-07-28 13:43:12] ADMIN ACTION : Booking Approved : BKG-1785225461057
+[2026-07-28 13:43:24] User Logout : admin@roomify.com
+[2026-07-28 13:43:34] User Login : student@roomify.com
