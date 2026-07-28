@@ -13,18 +13,13 @@ public class ResourceFileHandler {
      * Saves all resources.
      */
     public static <T> void saveResources(List<T> resources) {
-
         FilePersistenceEngine.saveObjects(resources, RESOURCE_FILE);
-
     }
 
     /**
      * Loads all resources.
      */
     public static <T> List<T> loadResources() {
-
         return FilePersistenceEngine.loadObjects(RESOURCE_FILE);
-
     }
-
 }

@@ -1,5 +1,6 @@
 package com.example.roomify.controller;
 
+import com.example.roomify.UserRole;
 import com.example.roomify.booking.BookingService;
 import com.example.roomify.model.Booking;
 import com.example.roomify.model.User;
@@ -16,6 +17,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,14 +26,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class DashboardController {
-    public DashboardController() {
-        System.out.println("DashboardController CONSTRUCTOR called");
-    }
+
     // ==================== FXML INJECTIONS ====================
     @FXML private Label totalResourcesLabel;
     @FXML private Label totalUsersLabel;
     @FXML private Label pendingBookingsLabel;
     @FXML private Label todayBookingsLabel;
+
+    // Stat card containers (for role-based visibility)
+    @FXML private VBox pendingBookingsCard;
+    @FXML private VBox todayBookingsCard;
 
     @FXML private TableView<LogEntry> recentActivitiesTable;
     @FXML private TableColumn<LogEntry, String> timestampColumn;
@@ -38,24 +43,25 @@ public class DashboardController {
     @FXML private TableColumn<LogEntry, String> userColumn;
     @FXML private TableColumn<LogEntry, String> descriptionColumn;
 
+    // Quick-action buttons (admin-only section)
+    @FXML private HBox quickActionsBox;
+    // Log section container
+    @FXML private VBox recentActivitiesBox;
+
     // ==================== DATA ====================
     private final ObservableList<LogEntry> logEntries = FXCollections.observableArrayList();
     private User currentUser;
 
     // ==================== INITIALIZATION ====================
     public void initContext(User user) {
-        System.out.println("DashboardController.initContext() START");
         this.currentUser = user;
         setupTableColumns();
         loadDashboardData();
         loadRecentActivities();
-        System.out.println("DashboardController.initContext() END - Data loaded: " + logEntries.size() + " entries");
     }
 
     @FXML
     public void initialize() {
-        System.out.println("DashboardController.initialize() called");
-        // Force column setup even if called before initContext
         setupTableColumns();
         loadDashboardData();
         loadRecentActivities();
@@ -68,46 +74,76 @@ public class DashboardController {
             userColumn.setCellValueFactory(new PropertyValueFactory<>("user"));
             descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         } catch (Exception e) {
-            System.err.println("Error setting up table columns: " + e.getMessage());
+            // Silent fail - UI will show empty table
         }
     }
 
     private void loadDashboardData() {
-        List<Booking> bookings = BookingService.getInstance().getBookings();
+        try {
+            List<Booking> bookings = BookingService.getInstance().getBookings();
 
-        long pendingCount = bookings.stream()
-                .filter(b -> "PENDING".equalsIgnoreCase(b.getStatus()))
-                .count();
+            long pendingCount = bookings.stream()
+                    .filter(b -> "PENDING".equalsIgnoreCase(b.getStatus()))
+                    .count();
 
-        LocalDate today = LocalDate.now();
-        long todayCount = bookings.stream()
-                .filter(b -> b.getStartTime() != null && b.getStartTime().toLocalDate().equals(today))
-                .count();
+            LocalDate today = LocalDate.now();
+            long todayCount = bookings.stream()
+                    .filter(b -> b.getStartTime() != null && b.getStartTime().toLocalDate().equals(today))
+                    .count();
 
-        int userCount = AuthenticationService.getInstance().getUserCount();
-        int resourceCount = ResourceFileHandler.loadResources().size();
+            int userCount = AuthenticationService.getInstance().getUserCount();
+            int resourceCount = ResourceFileHandler.loadResources().size();
 
-        totalResourcesLabel.setText(String.valueOf(resourceCount));
-        totalUsersLabel.setText(String.valueOf(userCount));
-        pendingBookingsLabel.setText(String.valueOf(pendingCount));
-        todayBookingsLabel.setText(String.valueOf(todayCount));
+            totalResourcesLabel.setText(String.valueOf(resourceCount));
+            totalUsersLabel.setText(String.valueOf(userCount));
+            pendingBookingsLabel.setText(String.valueOf(pendingCount));
+            todayBookingsLabel.setText(String.valueOf(todayCount));
+        } catch (Exception e) {
+            // Silent fail - keep default values
+        }
     }
 
     private void loadRecentActivities() {
-        logEntries.clear();
-
-        List<String> lines = FilePersistenceEngine.readText("system_log.txt");
-
-        // Show the most recent 10 entries, newest first
-        int start = Math.max(0, lines.size() - 10);
-        for (int i = lines.size() - 1; i >= start; i--) {
-            LogEntry entry = parseLogLine(lines.get(i));
-            if (entry != null) {
-                logEntries.add(entry);
+        // Only ADMIN users may see system logs, pending bookings card, and quick actions
+        if (currentUser == null || currentUser.getRole() != UserRole.ADMIN) {
+            // Hide the Pending Bookings card — it shows system-wide data, admin only
+            if (pendingBookingsCard != null) {
+                pendingBookingsCard.setVisible(false);
+                pendingBookingsCard.setManaged(false);
+                // Shift Today's Bookings left to fill the empty column slot
+                if (todayBookingsCard != null) {
+                    javafx.scene.layout.GridPane.setColumnIndex(todayBookingsCard, 0);
+                }
             }
+            if (recentActivitiesBox != null) {
+                recentActivitiesBox.setVisible(false);
+                recentActivitiesBox.setManaged(false);
+            }
+            if (quickActionsBox != null) {
+                quickActionsBox.setVisible(false);
+                quickActionsBox.setManaged(false);
+            }
+            return;
         }
 
-        recentActivitiesTable.setItems(logEntries);
+        try {
+            logEntries.clear();
+
+            List<String> lines = FilePersistenceEngine.readText("system_log.txt");
+
+            // Show the most recent 10 entries, newest first
+            int start = Math.max(0, lines.size() - 10);
+            for (int i = lines.size() - 1; i >= start; i--) {
+                LogEntry entry = parseLogLine(lines.get(i));
+                if (entry != null) {
+                    logEntries.add(entry);
+                }
+            }
+
+            recentActivitiesTable.setItems(logEntries);
+        } catch (Exception e) {
+            // Silent fail - show empty table
+        }
     }
 
     /**
@@ -141,6 +177,7 @@ public class DashboardController {
     // ==================== EVENT HANDLERS ====================
     @FXML
     private void handleRefresh(ActionEvent event) {
+        loadDashboardData();
         loadRecentActivities();
         AlertHelper.showInformation("Refreshed", "Dashboard data refreshed.");
     }

@@ -73,21 +73,19 @@ public class BookingService {
 
         // Link this booking into the approval workflow so admins can act on it
         ApprovalWorkflowService.getInstance().submitForApproval(bookingID, resourceID, userID);
-
-        System.out.println("Booking created successfully.");
     }
 
     /**
      * Cancels a booking.
      */
     public boolean cancelBooking(String bookingID) {
-        for (Booking booking : bookings) {            if (booking.getBookingId().equalsIgnoreCase(bookingID)) {
-            booking.setStatus("CANCELLED");
-            BookingFileHandler.saveBookings(bookings);
-            SystemLogger.logBookingCancelled(bookingID);
-            System.out.println("Booking cancelled.");
-            return true;
-        }
+        for (Booking booking : bookings) {
+            if (booking.getBookingId().equalsIgnoreCase(bookingID)) {
+                booking.setStatus("CANCELLED");
+                BookingFileHandler.saveBookings(bookings);
+                SystemLogger.logBookingCancelled(bookingID);
+                return true;
+            }
         }
         return false;
     }
@@ -101,7 +99,6 @@ public class BookingService {
                 booking.setStatus("APPROVED");
                 BookingFileHandler.saveBookings(bookings);
                 SystemLogger.logAdminAction("Booking Approved : " + bookingID);
-                System.out.println("Booking approved.");
                 return true;
             }
         }
@@ -117,7 +114,6 @@ public class BookingService {
                 booking.setStatus("REJECTED");
                 BookingFileHandler.saveBookings(bookings);
                 SystemLogger.logAdminAction("Booking Rejected : " + bookingID + ". Reason: " + reason);
-                System.out.println("Booking rejected.");
                 return true;
             }
         }
@@ -132,5 +128,6 @@ public class BookingService {
     }
 
     public void refreshBookings() {
+        // Method intentionally left blank - refresh logic handled elsewhere
     }
 }

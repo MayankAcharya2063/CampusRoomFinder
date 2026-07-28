@@ -96,7 +96,6 @@ public class BookingController {
         try {
             createBooking(selectedResource, currentUser, start, end, purposeField.getText().trim());
 
-            // Fixed method name: showInformation instead of showInfo
             AlertHelper.showInformation(
                     "Booking Requested",
                     selectedResource.getName() + " requested for " + start + " to " + end + "."

@@ -1,6 +1,9 @@
 package com.example.roomify.controller;
 
+import com.example.roomify.StageCoordinator;
+import com.example.roomify.UserRole;
 import com.example.roomify.model.User;
+import com.example.roomify.persistence.FilePersistenceEngine;
 import com.example.roomify.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,9 +15,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class SystemLogsController {
 
@@ -32,15 +35,24 @@ public class SystemLogsController {
     private User currentUser;
 
     public void initContext(User user) {
+        // SECURITY CHECK: Only admins can view logs
+        if (user.getRole() != UserRole.ADMIN) {
+            AlertHelper.showError("Access Denied", "You do not have permission to view system logs.");
+            // Redirect back to dashboard
+            Stage currentStage = (Stage) statusLabel.getScene().getWindow();
+            StageCoordinator.getInstance().showDashboardForUser(user, currentStage);
+            return;
+        }
+
         this.currentUser = user;
         setupTableColumns();
-        loadSampleLogs();
+        loadLogsFromFile();
     }
 
     @FXML
     public void initialize() {
         setupTableColumns();
-        loadSampleLogs();
+        // Don't load logs here - wait for initContext
     }
 
     private void setupTableColumns() {
@@ -50,26 +62,62 @@ public class SystemLogsController {
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
     }
 
-    private void loadSampleLogs() {
+    private void loadLogsFromFile() {
         allLogs.clear();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
+        List<String> lines = FilePersistenceEngine.readText("system_log.txt");
 
-        allLogs.addAll(
-                new LogEntry(now.format(formatter), "Login", "Admin User", "Admin logged in successfully"),
-                new LogEntry(now.minusMinutes(5).format(formatter), "Booking Approved", "Admin User", "Booking B-101 approved for Study Room A"),
-                new LogEntry(now.minusMinutes(12).format(formatter), "Resource Added", "Admin User", "New resource 'Study Room 3B' added"),
-                new LogEntry(now.minusMinutes(20).format(formatter), "Booking Request", "Jane Student", "Study Room A requested for tomorrow 10:00-11:00"),
-                new LogEntry(now.minusMinutes(30).format(formatter), "Login", "Jane Student", "Student logged in"),
-                new LogEntry(now.minusHours(1).format(formatter), "User Created", "Admin User", "New student account created for David Kumar"),
-                new LogEntry(now.minusHours(2).format(formatter), "Logout", "John Staff", "Staff logged out"),
-                new LogEntry(now.minusHours(3).format(formatter), "Booking Cancelled", "Sarah Chen", "Booking B-003 cancelled by requester")
-        );
+        for (String line : lines) {
+            LogEntry entry = parseLogLine(line);
+            if (entry != null) {
+                allLogs.add(entry);
+            }
+        }
 
         filteredLogs = new FilteredList<>(allLogs, p -> true);
         logTable.setItems(filteredLogs);
         updateTotalCount();
-        statusLabel.setText("Ready");
+        statusLabel.setText("Showing " + filteredLogs.size() + " logs");
+    }
+
+    private LogEntry parseLogLine(String line) {
+        if (line == null || !line.startsWith("[")) {
+            return null;
+        }
+
+        int closeBracket = line.indexOf(']');
+        if (closeBracket < 0) {
+            return null;
+        }
+
+        String timestamp = line.substring(1, closeBracket);
+        String message = line.substring(closeBracket + 1).trim();
+
+        String action = message;
+        String user = "";
+        String description = "";
+
+        int separator = message.indexOf(" : ");
+        if (separator >= 0) {
+            action = message.substring(0, separator);
+            String remainder = message.substring(separator + 3);
+
+            if (action.contains("Login") || action.contains("Logout") || action.contains("Password")) {
+                user = remainder;
+                description = remainder;
+            } else if (action.contains("Booking")) {
+                user = "System";
+                description = remainder;
+            } else {
+                user = "Admin";
+                description = remainder;
+            }
+        } else {
+            action = message;
+            user = "System";
+            description = message;
+        }
+
+        return new LogEntry(timestamp, action, user, description);
     }
 
     private void updateTotalCount() {
@@ -92,8 +140,8 @@ public class SystemLogsController {
 
     @FXML
     private void handleRefresh(ActionEvent event) {
-        loadSampleLogs();
-        AlertHelper.showInformation("Refreshed", "Logs refreshed.");
+        loadLogsFromFile();
+        AlertHelper.showInformation("Refreshed", "Logs refreshed from file.");
     }
 
     @FXML

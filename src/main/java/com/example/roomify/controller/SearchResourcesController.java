@@ -74,6 +74,7 @@ public class SearchResourcesController {
         capacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        // Colour-code the status text
         statusColumn.setCellFactory(column -> new TableCell<Resource, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -94,6 +95,37 @@ public class SearchResourcesController {
                     setStyle("-fx-text-fill: #EF4444; -fx-font-weight: bold;");
                 }
             }
+        });
+
+        // ── Row highlight on selection ──────────────────────────────
+        resourceTable.setRowFactory(tv -> {
+            TableRow<Resource> row = new TableRow<>() {
+                @Override
+                protected void updateItem(Resource item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setStyle("");
+                    } else if (isSelected()) {
+                        setStyle("-fx-background-color: #FCE4EC; "
+                                + "-fx-border-color: #E91E63; "
+                                + "-fx-border-width: 0 0 0 4; "
+                                + "-fx-font-weight: bold;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            };
+            // Re-apply style whenever the selection state changes
+            row.selectedProperty().addListener((obs, wasSelected, isNowSelected) ->
+                    row.pseudoClassStateChanged(
+                            javafx.css.PseudoClass.getPseudoClass("selected"), isNowSelected));
+            return row;
+        });
+
+        // Enable/disable Book button based on selection
+        resourceTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
+            boolean canBook = newVal != null && "AVAILABLE".equals(newVal.getStatus());
+            bookButton.setDisable(!canBook);
         });
     }
 
@@ -137,14 +169,6 @@ public class SearchResourcesController {
             }
 
             return true;
-        });
-
-        resourceTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
-            if (newVal != null && "AVAILABLE".equals(newVal.getStatus())) {
-                bookButton.setDisable(false);
-            } else {
-                bookButton.setDisable(true);
-            }
         });
     }
 

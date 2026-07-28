@@ -15,18 +15,13 @@ public class BookingFileHandler {
      * Saves all booking records.
      */
     public static void saveBookings(List<Booking> bookings) {
-
         FilePersistenceEngine.saveObjects(bookings, BOOKING_FILE);
-
     }
 
     /**
      * Loads all booking records.
      */
     public static List<Booking> loadBookings() {
-
         return FilePersistenceEngine.loadObjects(BOOKING_FILE);
-
     }
-
 }

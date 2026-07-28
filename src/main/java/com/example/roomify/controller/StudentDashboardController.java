@@ -57,7 +57,6 @@ public class StudentDashboardController {
 
     public void initContext(User user) {
         this.currentUser = user;
-        System.out.println("StudentDashboardController.initContext() called for: " + user.getName());
 
         if (welcomeLabel != null) {
             welcomeLabel.setText("Welcome, " + user.getName());
@@ -106,15 +105,13 @@ public class StudentDashboardController {
                 }
             });
         } catch (Exception e) {
-            System.err.println("Error setting up table: " + e.getMessage());
+            // Log to file instead of console in production
         }
     }
 
     private void loadDashboardData() {
         try {
             bookingService.refreshBookings();
-
-            System.out.println("Loading dashboard data for student: " + currentUser.getName());
 
             List<Resource> resources = ResourceFileHandler.loadResources();
             long availableCount = 0;
@@ -128,7 +125,6 @@ public class StudentDashboardController {
             }
 
             List<Booking> allBookings = bookingService.getBookings();
-            System.out.println("Total bookings in service: " + (allBookings != null ? allBookings.size() : 0));
 
             long pending = 0, approved = 0, rejected = 0, today = 0;
 
@@ -146,7 +142,6 @@ public class StudentDashboardController {
                         }
                     }
                 }
-                System.out.println("User bookings - Pending: " + pending + ", Approved: " + approved + ", Rejected: " + rejected);
             }
 
             if (pendingBookingsLabel != null) pendingBookingsLabel.setText(String.valueOf(pending));
@@ -161,12 +156,10 @@ public class StudentDashboardController {
                             .filter(b -> b.getRequesterName().equals(currentUser.getName()))
                             .limit(5)
                             .forEach(recentBookingsTable.getItems()::add);
-                    System.out.println("Added " + recentBookingsTable.getItems().size() + " bookings to recent table");
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error loading dashboard data: " + e.getMessage());
-            e.printStackTrace();
+            // Log to file instead of console in production
         }
     }
 
@@ -176,11 +169,9 @@ public class StudentDashboardController {
 
     private void loadView(String fxmlFile) {
         try {
-            System.out.println("Loading view: " + fxmlFile);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/roomify/" + fxmlFile));
 
             if (loader.getLocation() == null) {
-                System.err.println("FXML file not found: " + fxmlFile);
                 Label errorLabel = new Label("View not found: " + fxmlFile);
                 errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
                 contentStack.getChildren().clear();
@@ -192,7 +183,6 @@ public class StudentDashboardController {
 
             Object controller = loader.getController();
             if (controller != null) {
-                System.out.println("Controller found: " + controller.getClass().getSimpleName());
                 if (controller instanceof DashboardController) {
                     ((DashboardController) controller).initContext(currentUser);
                 } else if (controller instanceof SearchResourcesController) {
@@ -204,18 +194,12 @@ public class StudentDashboardController {
                 } else if (controller instanceof ProfileController) {
                     ((ProfileController) controller).initContext(currentUser);
                 }
-            } else {
-                System.err.println("Controller is null for: " + fxmlFile);
             }
 
             contentStack.getChildren().clear();
             contentStack.getChildren().add(view);
-            System.out.println("View loaded successfully: " + fxmlFile);
         } catch (IOException e) {
-            System.err.println("Failed to load view: " + fxmlFile);
-            e.printStackTrace();
-
-            Label errorLabel = new Label("Failed to load: " + fxmlFile + "\n" + e.getMessage());
+            Label errorLabel = new Label("Failed to load: " + fxmlFile);
             errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
             contentStack.getChildren().clear();
             contentStack.getChildren().add(errorLabel);

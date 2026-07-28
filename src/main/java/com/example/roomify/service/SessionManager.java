@@ -18,12 +18,10 @@ public class SessionManager {
 
     public void login(User user) {
         this.currentUser = user;
-        System.out.println("Session started for: " + user.getName());
     }
 
     public void logout() {
         if (currentUser != null) {
-            System.out.println("Session ended for: " + currentUser.getName());
             SystemLogger.logLogout(currentUser.getEmail());
         }
         this.currentUser = null;

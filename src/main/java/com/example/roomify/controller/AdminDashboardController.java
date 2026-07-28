@@ -34,7 +34,6 @@ public class AdminDashboardController {
 
     public void initContext(User user) {
         this.currentUser = user;
-        System.out.println("AdminDashboardController.initContext() called for: " + user.getName());
 
         if (welcomeLabel != null) {
             welcomeLabel.setText("Welcome, " + user.getName());
@@ -73,13 +72,11 @@ public class AdminDashboardController {
 
     private void loadView(String fxmlFile) {
         try {
-            System.out.println("Loading view: " + fxmlFile);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/roomify/" + fxmlFile));
             Parent view = loader.load();
 
             Object controller = loader.getController();
             if (controller != null) {
-                System.out.println("Controller found: " + controller.getClass().getSimpleName());
                 if (controller instanceof DashboardController) {
                     ((DashboardController) controller).initContext(currentUser);
                 } else if (controller instanceof ManageResourceController) {
@@ -93,17 +90,11 @@ public class AdminDashboardController {
                 } else if (controller instanceof SystemLogsController) {
                     ((SystemLogsController) controller).initContext(currentUser);
                 }
-            } else {
-                System.err.println("Controller is null for: " + fxmlFile);
             }
 
             contentStack.getChildren().clear();
             contentStack.getChildren().add(view);
-            System.out.println("View loaded successfully: " + fxmlFile);
         } catch (IOException e) {
-            System.err.println("Failed to load view: " + fxmlFile);
-            e.printStackTrace();
-
             Label errorLabel = new Label("Failed to load: " + fxmlFile + "\n" + e.getMessage());
             errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
             contentStack.getChildren().clear();

@@ -105,26 +105,16 @@ public class StageCoordinator {
      * Route user to their role-specific dashboard.
      */
     public void showDashboardForUser(User user, Stage stage) {
-        if (user == null) {
-            showLogin(stage);
-            return;
-        }
-        if (user.getRole() == null) {
-            showLogin(stage);
-            return;
-        }
         switch (user.getRole()) {
             case ADMIN:
-                showAdminDashboard(user, stage);
+                showAdminDashboard(user, stage);  // Only admin gets logs
                 break;
             case STAFF:
-                showStaffDashboard(user, stage);
+                showStaffDashboard(user, stage);  // Staff has NO logs
                 break;
             case STUDENT:
-                showStudentDashboard(user, stage);
+                showStudentDashboard(user, stage); // Student has NO logs
                 break;
-            default:
-                showLogin(stage);
         }
     }
     /**
@@ -233,8 +223,6 @@ public class StageCoordinator {
      * Displays a uniform error dialog when a view fails to load.
      */
     private void handleLoadFailure(String viewName, Exception e) {
-        System.err.println("Failed to load " + viewName + ": " + e.getMessage());
-        e.printStackTrace();
         AlertHelper.showError(
                 "Navigation Error",
                 "Failed to load " + viewName + ".\nDetails: " + e.getMessage()

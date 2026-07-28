@@ -19,24 +19,28 @@
 
     <children>
         <!-- Welcome Section -->
-        <VBox spacing="4.0">
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
             <children>
-                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #880E4F;" text="Dashboard" />
-                <Label style="-fx-text-fill: #AD1457;" text="Welcome back! Here's an overview of your campus resources." />
+                <VBox spacing="4.0">
+                    <children>
+                        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #880E4F;" text="Dashboard" />
+                        <Label style="-fx-text-fill: #AD1457;" text="Welcome back! Here's an overview of your campus resources." />
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh" />
             </children>
-        </VBox>
+        </HBox>
 
         <!-- Stats Cards -->
-        <GridPane hgap="20.0" vgap="20.0">
+        <GridPane hgap="20.0" vgap="20.0" alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints percentWidth="25.0" />
-                <ColumnConstraints percentWidth="25.0" />
-                <ColumnConstraints percentWidth="25.0" />
-                <ColumnConstraints percentWidth="25.0" />
+                <ColumnConstraints percentWidth="30.0" halignment="CENTER" />
+                <ColumnConstraints percentWidth="30.0" halignment="CENTER" />
             </columnConstraints>
             <children>
                 <!-- Card 1: Total Resources -->
-                <VBox styleClass="stat-card" style="-fx-padding: 20;" spacing="8.0" GridPane.columnIndex="0">
+                <VBox styleClass="stat-card" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 10;" spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <children>
                         <Label styleClass="stat-icon" text="📚" />
                         <Label styleClass="stat-value" fx:id="totalResourcesLabel" text="0" />
@@ -45,7 +49,7 @@
                 </VBox>
 
                 <!-- Card 2: Total Users -->
-                <VBox styleClass="stat-card" style="-fx-padding: 20;" spacing="8.0" GridPane.columnIndex="1">
+                <VBox styleClass="stat-card" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 10;" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <children>
                         <Label styleClass="stat-icon" text="👥" />
                         <Label styleClass="stat-value" fx:id="totalUsersLabel" text="0" />
@@ -54,7 +58,7 @@
                 </VBox>
 
                 <!-- Card 3: Pending Bookings -->
-                <VBox styleClass="stat-card" style="-fx-padding: 20;" spacing="8.0" GridPane.columnIndex="2">
+                <VBox fx:id="pendingBookingsCard" styleClass="stat-card" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 10;" spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <children>
                         <Label styleClass="stat-icon" text="⏳" />
                         <Label styleClass="stat-value" fx:id="pendingBookingsLabel" text="0" />
@@ -63,7 +67,7 @@
                 </VBox>
 
                 <!-- Card 4: Today's Bookings -->
-                <VBox styleClass="stat-card" style="-fx-padding: 20;" spacing="8.0" GridPane.columnIndex="3">
+                <VBox fx:id="todayBookingsCard" styleClass="stat-card" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 10;" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <children>
                         <Label styleClass="stat-icon" text="📅" />
                         <Label styleClass="stat-value" fx:id="todayBookingsLabel" text="0" />
@@ -74,13 +78,13 @@
         </GridPane>
 
         <!-- Recent Activities -->
-        <VBox spacing="12.0">
+        <VBox fx:id="recentActivitiesBox" spacing="12.0">
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <children>
                         <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #880E4F;" text="Recent Activities" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh" />
+                        <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh Logs" />
                     </children>
                 </HBox>
                 <TableView fx:id="recentActivitiesTable"
@@ -97,7 +101,7 @@
         </VBox>
 
         <!-- Quick Actions -->
-        <HBox spacing="12.0">
+        <HBox fx:id="quickActionsBox" spacing="12.0">
             <children>
                 <Button onAction="#handleQuickAddResource" styleClass="btn-primary" text="➕ Add Resource" />
                 <Button onAction="#handleQuickAddUser" styleClass="btn-primary" text="➕ Add User" />
